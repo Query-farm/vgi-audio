@@ -1,0 +1,86 @@
+# name: test/sql/features.test
+# description: Audio feature scalars (spectral, tempo, mfcc, key, beats) over WAV fixtures
+# group: [vgi_audio]
+
+require-env VGI_AUDIO_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION '${VGI_AUDIO_WORKER}');
+
+# ---- spectral centroid of a 440 Hz tone sits in a sane band (NOT an exact float) ----
+
+query I
+SELECT audio.spectral_centroid('test/sql/data/tone_440.wav') BETWEEN 300.0 AND 1000.0;
+----
+true
+
+# ---- rms_energy and zero_crossing_rate are finite and in range ----
+
+query I
+SELECT audio.rms_energy('test/sql/data/tone_440.wav') > 0.0;
+----
+true
+
+query I
+SELECT audio.zero_crossing_rate('test/sql/data/tone_440.wav') BETWEEN 0.0 AND 1.0;
+----
+true
+
+query I
+SELECT audio.spectral_bandwidth('test/sql/data/tone_440.wav') > 0.0;
+----
+true
+
+# ---- tempo of a 120 BPM click track within a generous range ----
+
+query I
+SELECT audio.tempo('test/sql/data/click_120.wav') BETWEEN 100.0 AND 140.0;
+----
+true
+
+# ---- mfcc length == n (default 13, and explicit overload) ----
+
+query I
+SELECT len(audio.mfcc('test/sql/data/tone_440.wav'));
+----
+13
+
+query I
+SELECT len(audio.mfcc('test/sql/data/tone_440.wav', 20));
+----
+20
+
+# ---- estimated_key (heuristic) is a '<pitch> major|minor' string or NULL ----
+
+query I
+SELECT audio.estimated_key('test/sql/data/tone_440.wav') IS NULL
+    OR audio.estimated_key('test/sql/data/tone_440.wav') LIKE '% major'
+    OR audio.estimated_key('test/sql/data/tone_440.wav') LIKE '% minor';
+----
+true
+
+# ---- beats() table function returns ascending rows ----
+
+query I
+SELECT count(*) > 3 FROM audio.beats('test/sql/data/click_120.wav');
+----
+true
+
+# seq is dense 0-based and time is strictly ascending by seq.
+query I
+SELECT bool_and(time > prev_time) AND bool_and(seq = prev_seq + 1)
+FROM (
+    SELECT seq, time,
+           lag(time) OVER (ORDER BY seq) AS prev_time,
+           lag(seq)  OVER (ORDER BY seq) AS prev_seq
+    FROM audio.beats('test/sql/data/click_120.wav')
+)
+WHERE prev_time IS NOT NULL;
+----
+true
+
+statement ok
+DETACH audio;

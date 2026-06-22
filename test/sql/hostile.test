@@ -1,0 +1,94 @@
+# name: test/sql/hostile.test
+# description: Untrusted/malformed audio must yield NULL / no rows, never crash the worker
+# group: [vgi_audio]
+
+require-env VGI_AUDIO_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION '${VGI_AUDIO_WORKER}');
+
+# ---- garbage BLOB bytes -> NULL (worker survives hostile input) ----
+
+query I
+SELECT audio.duration('not audio at all, just bytes'::BLOB) IS NULL;
+----
+true
+
+query I
+SELECT audio.sample_rate('\x00\x01\x02\xFF garbage'::BLOB) IS NULL;
+----
+true
+
+query I
+SELECT audio.tempo('not a real audio file'::BLOB) IS NULL;
+----
+true
+
+query I
+SELECT audio.mfcc('junk junk junk'::BLOB) IS NULL;
+----
+true
+
+# ---- empty BLOB -> NULL ----
+
+query I
+SELECT audio.duration(''::BLOB) IS NULL;
+----
+true
+
+# ---- NULL input -> NULL output ----
+
+query I
+SELECT audio.duration(NULL::VARCHAR) IS NULL;
+----
+true
+
+query I
+SELECT audio.sample_rate(NULL::BLOB) IS NULL;
+----
+true
+
+# ---- nonexistent path -> NULL ----
+
+query I
+SELECT audio.duration('/no/such/file/anywhere.wav') IS NULL;
+----
+true
+
+# ---- a bad row next to a good one: the good value still comes through ----
+
+query II rowsort
+SELECT label, audio.sample_rate(b) AS sr
+FROM (
+    VALUES
+        ('garbage', 'not audio'::BLOB),
+        ('good', (SELECT content FROM read_blob('test/sql/data/tone_440.wav')))
+) AS t(label, b);
+----
+garbage	NULL
+good	22050
+
+# ---- table functions on garbage -> no rows (still no crash) ----
+
+query I
+SELECT count(*) FROM audio.beats('not audio'::BLOB);
+----
+0
+
+query I
+SELECT count(*) FROM audio.audio_info('not audio'::BLOB);
+----
+0
+
+# ---- worker is still alive and serving after all that hostile input ----
+
+query I
+SELECT audio.sample_rate('test/sql/data/tone_440.wav');
+----
+22050
+
+statement ok
+DETACH audio;

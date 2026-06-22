@@ -1,0 +1,52 @@
+# name: test/sql/metadata.test
+# description: Audio metadata scalars (duration, sample_rate, channels) over WAV fixtures
+# group: [vgi_audio]
+
+require-env VGI_AUDIO_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION '${VGI_AUDIO_WORKER}');
+
+# ---- exact metadata from a file PATH ----
+
+query I
+SELECT audio.sample_rate('test/sql/data/tone_440.wav');
+----
+22050
+
+query I
+SELECT audio.channels('test/sql/data/tone_440.wav');
+----
+1
+
+# Duration is 1.0s exactly (within tolerance).
+query I
+SELECT abs(audio.duration('test/sql/data/tone_440.wav') - 1.0) < 0.01;
+----
+true
+
+# ---- same metadata from BLOB bytes (read_blob) ----
+
+query I
+SELECT audio.sample_rate(content) FROM read_blob('test/sql/data/tone_440.wav');
+----
+22050
+
+query I
+SELECT abs(audio.duration(content) - 1.0) < 0.01 FROM read_blob('test/sql/data/tone_440.wav');
+----
+true
+
+# ---- audio_info() table function (single row) ----
+
+query III
+SELECT duration > 0.99 AND duration < 1.01, sample_rate, channels
+FROM audio.audio_info('test/sql/data/tone_440.wav');
+----
+true	22050	1
+
+statement ok
+DETACH audio;
