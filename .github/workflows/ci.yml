@@ -60,7 +60,10 @@ jobs:
         run: uv run ruff check .
 
       - name: Type check (mypy)
-        run: uv run mypy vgi_audio/
+        run: uv run mypy vgi_audio/ audio_worker.py
+
+      - name: Docstring lint (pydoclint)
+        run: uv run pydoclint vgi_audio/ audio_worker.py
 
   # Resolve the latest published haybarn release once, so the whole matrix tests
   # the same version (and we never hardcode/pin it).

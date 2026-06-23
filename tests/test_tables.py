@@ -45,9 +45,7 @@ def click_bytes() -> bytes:
 
 class TestBeats:
     def test_columns_and_rows_bytes(self, click_bytes: bytes) -> None:
-        table = invoke_table_function(
-            BeatsBytesFunction, positional=(pa.scalar(click_bytes, type=pa.binary()),)
-        )
+        table = invoke_table_function(BeatsBytesFunction, positional=(pa.scalar(click_bytes, type=pa.binary()),))
         assert table.column_names == ["seq", "time"]
         assert table.num_rows > 3
         times = table.column("time").to_pylist()
@@ -59,17 +57,13 @@ class TestBeats:
         assert table.column_names == ["seq", "time"]
 
     def test_garbage_no_rows(self) -> None:
-        table = invoke_table_function(
-            BeatsBytesFunction, positional=(pa.scalar(b"not audio", type=pa.binary()),)
-        )
+        table = invoke_table_function(BeatsBytesFunction, positional=(pa.scalar(b"not audio", type=pa.binary()),))
         assert table.num_rows == 0
 
 
 class TestAudioInfo:
     def test_single_row_bytes(self, tone_bytes: bytes) -> None:
-        table = invoke_table_function(
-            AudioInfoBytesFunction, positional=(pa.scalar(tone_bytes, type=pa.binary()),)
-        )
+        table = invoke_table_function(AudioInfoBytesFunction, positional=(pa.scalar(tone_bytes, type=pa.binary()),))
         assert table.column_names == ["duration", "sample_rate", "channels"]
         assert table.num_rows == 1
         assert table.column("sample_rate").to_pylist() == [22050]
@@ -77,14 +71,10 @@ class TestAudioInfo:
         assert abs(table.column("duration").to_pylist()[0] - 2.0) < 1e-3
 
     def test_path_overload(self, tone_path: str) -> None:
-        table = invoke_table_function(
-            AudioInfoPathFunction, positional=(pa.scalar(tone_path, type=pa.string()),)
-        )
+        table = invoke_table_function(AudioInfoPathFunction, positional=(pa.scalar(tone_path, type=pa.string()),))
         assert table.num_rows == 1
         assert table.column("sample_rate").to_pylist() == [22050]
 
     def test_garbage_no_rows(self) -> None:
-        table = invoke_table_function(
-            AudioInfoBytesFunction, positional=(pa.scalar(b"junk", type=pa.binary()),)
-        )
+        table = invoke_table_function(AudioInfoBytesFunction, positional=(pa.scalar(b"junk", type=pa.binary()),))
         assert table.num_rows == 0

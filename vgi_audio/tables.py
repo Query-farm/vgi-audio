@@ -17,7 +17,7 @@ logic returns ``None``; the worker never crashes).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Annotated, ClassVar
+from typing import Annotated, Any, ClassVar
 
 import pyarrow as pa
 from vgi.arguments import Arg
@@ -36,8 +36,8 @@ from . import features
 from .features import AudioInput
 from .schema_utils import field
 
-_PATH_ARG: Arg = Arg(0, arrow_type=pa.string(), doc="Filesystem path to an audio file the worker will open.")
-_BLOB_ARG: Arg = Arg(0, arrow_type=pa.binary(), doc="Raw audio bytes (e.g. the contents of a WAV/FLAC file).")
+_PATH_ARG: Arg[str] = Arg(0, arrow_type=pa.string(), doc="Filesystem path to an audio file the worker will open.")
+_BLOB_ARG: Arg[bytes] = Arg(0, arrow_type=pa.binary(), doc="Raw audio bytes (e.g. the contents of a WAV/FLAC file).")
 
 
 # ===========================================================================
@@ -67,7 +67,7 @@ _BEATS_SCHEMA = pa.schema(
 )
 
 
-def _emit_beats(audio: AudioInput | None, params: ProcessParams, out: OutputCollector) -> None:
+def _emit_beats(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     times = features.beat_times(audio)
     if times is None:
         times = []  # undecodable -> no rows (still emit an empty batch + finish)
@@ -88,6 +88,8 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
     FIXED_SCHEMA: ClassVar[pa.Schema] = _BEATS_SCHEMA
 
     class Meta:
+        """Function metadata."""
+
         name = "beats"
         description = "Beat onset times (seq, time) of an audio file path"
         categories = ["audio", "rhythm"]
@@ -100,10 +102,12 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
 
     @classmethod
     def cardinality(cls, params: BindParams[_BeatsPathArgs]) -> TableCardinality:
+        """Estimated and maximum row count for the planner."""
         return TableCardinality(estimate=None, max=None)
 
     @classmethod
     def process(cls, params: ProcessParams[_BeatsPathArgs], state: None, out: OutputCollector) -> None:
+        """Emit the result rows for this audio input."""
         _emit_beats(AudioInput.from_path(params.args.path), params, out)
 
 
@@ -115,6 +119,8 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
     FIXED_SCHEMA: ClassVar[pa.Schema] = _BEATS_SCHEMA
 
     class Meta:
+        """Function metadata."""
+
         name = "beats"
         description = "Beat onset times (seq, time) of a BLOB of audio bytes"
         categories = ["audio", "rhythm"]
@@ -127,10 +133,12 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
 
     @classmethod
     def cardinality(cls, params: BindParams[_BeatsBytesArgs]) -> TableCardinality:
+        """Estimated and maximum row count for the planner."""
         return TableCardinality(estimate=None, max=None)
 
     @classmethod
     def process(cls, params: ProcessParams[_BeatsBytesArgs], state: None, out: OutputCollector) -> None:
+        """Emit the result rows for this audio input."""
         _emit_beats(AudioInput.from_bytes(params.args.blob), params, out)
 
 
@@ -162,7 +170,7 @@ _INFO_SCHEMA = pa.schema(
 )
 
 
-def _emit_info(audio: AudioInput | None, params: ProcessParams, out: OutputCollector) -> None:
+def _emit_info(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     info = features.audio_info(audio)
     if info is None:
         # undecodable -> no rows.
@@ -191,6 +199,8 @@ class AudioInfoPathFunction(TableFunctionGenerator[_InfoPathArgs]):
     FIXED_SCHEMA: ClassVar[pa.Schema] = _INFO_SCHEMA
 
     class Meta:
+        """Function metadata."""
+
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of an audio file path"
         categories = ["audio", "metadata"]
@@ -203,10 +213,12 @@ class AudioInfoPathFunction(TableFunctionGenerator[_InfoPathArgs]):
 
     @classmethod
     def cardinality(cls, params: BindParams[_InfoPathArgs]) -> TableCardinality:
+        """Estimated and maximum row count for the planner."""
         return TableCardinality(estimate=1, max=1)
 
     @classmethod
     def process(cls, params: ProcessParams[_InfoPathArgs], state: None, out: OutputCollector) -> None:
+        """Emit the result rows for this audio input."""
         _emit_info(AudioInput.from_path(params.args.path), params, out)
 
 
@@ -218,6 +230,8 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
     FIXED_SCHEMA: ClassVar[pa.Schema] = _INFO_SCHEMA
 
     class Meta:
+        """Function metadata."""
+
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of a BLOB of audio bytes"
         categories = ["audio", "metadata"]
@@ -230,10 +244,12 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
 
     @classmethod
     def cardinality(cls, params: BindParams[_InfoBytesArgs]) -> TableCardinality:
+        """Estimated and maximum row count for the planner."""
         return TableCardinality(estimate=1, max=1)
 
     @classmethod
     def process(cls, params: ProcessParams[_InfoBytesArgs], state: None, out: OutputCollector) -> None:
+        """Emit the result rows for this audio input."""
         _emit_info(AudioInput.from_bytes(params.args.blob), params, out)
 
 

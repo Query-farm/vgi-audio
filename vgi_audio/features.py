@@ -32,7 +32,7 @@ import io
 import math
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -88,7 +88,7 @@ def _librosa() -> ModuleType:
             import librosa  # noqa: PLC0415 - intentionally lazy + cached
 
             _librosa_module = librosa
-    return _librosa_module
+    return cast("ModuleType", _librosa_module)
 
 
 def warm_up() -> None:
@@ -110,12 +110,14 @@ class AudioInput:
 
     @classmethod
     def from_path(cls, path: str | None) -> AudioInput | None:
+        """Wrap a filesystem path, passing ``None`` straight through."""
         if path is None:
             return None
         return cls(path=path)
 
     @classmethod
     def from_bytes(cls, data: bytes | None) -> AudioInput | None:
+        """Wrap raw audio bytes, passing ``None`` straight through."""
         if data is None:
             return None
         return cls(data=data)

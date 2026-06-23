@@ -46,16 +46,12 @@ from .features import AudioInput
 # ---------------------------------------------------------------------------
 
 
-def _map_path[T](
-    arr: pa.StringArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType
-) -> pa.Array:
+def _map_path[T](arr: pa.StringArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType) -> pa.Array:
     out = [fn(AudioInput.from_path(x)) for x in arr.to_pylist()]
     return pa.array(out, type=arrow_type)
 
 
-def _map_bytes[T](
-    arr: pa.BinaryArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType
-) -> pa.Array:
+def _map_bytes[T](arr: pa.BinaryArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType) -> pa.Array:
     out = [fn(AudioInput.from_bytes(x)) for x in arr.to_pylist()]
     return pa.array(out, type=arrow_type)
 
@@ -73,19 +69,18 @@ class DurationPathFunction(ScalarFunction):
     """``duration(path)`` -- audio duration in seconds (NULL if undecodable)."""
 
     class Meta:
+        """Function metadata."""
+
         name = "duration"
         description = "Audio duration in seconds, from a file path (NULL if undecodable)"
         categories = ["audio", "metadata"]
         examples = [
-            FunctionExample(
-                sql="SELECT audio.duration('/tmp/tone.wav')", description="Duration of a WAV file"
-            ),
+            FunctionExample(sql="SELECT audio.duration('/tmp/tone.wav')", description="Duration of a WAV file"),
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.duration, pa.float64())
 
 
@@ -93,6 +88,8 @@ class DurationBytesFunction(ScalarFunction):
     """``duration(blob)`` -- audio duration in seconds from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "duration"
         description = "Audio duration in seconds, from a BLOB of audio bytes (NULL if undecodable)"
         categories = ["audio", "metadata"]
@@ -104,9 +101,8 @@ class DurationBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.duration, pa.float64())
 
 
@@ -119,19 +115,18 @@ class SampleRatePathFunction(ScalarFunction):
     """``sample_rate(path)`` -- native sample rate in Hz."""
 
     class Meta:
+        """Function metadata."""
+
         name = "sample_rate"
         description = "Native sample rate in Hz, from a file path (NULL if undecodable)"
         categories = ["audio", "metadata"]
         examples = [
-            FunctionExample(
-                sql="SELECT audio.sample_rate('/tmp/tone.wav')", description="Sample rate of a WAV"
-            ),
+            FunctionExample(sql="SELECT audio.sample_rate('/tmp/tone.wav')", description="Sample rate of a WAV"),
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.Int32Array, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.sample_rate, pa.int32())
 
 
@@ -139,6 +134,8 @@ class SampleRateBytesFunction(ScalarFunction):
     """``sample_rate(blob)`` -- native sample rate in Hz from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "sample_rate"
         description = "Native sample rate in Hz, from a BLOB of audio bytes (NULL if undecodable)"
         categories = ["audio", "metadata"]
@@ -150,9 +147,8 @@ class SampleRateBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.Int32Array, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.sample_rate, pa.int32())
 
 
@@ -165,19 +161,18 @@ class ChannelsPathFunction(ScalarFunction):
     """``channels(path)`` -- number of audio channels."""
 
     class Meta:
+        """Function metadata."""
+
         name = "channels"
         description = "Number of audio channels (1=mono, 2=stereo), from a file path"
         categories = ["audio", "metadata"]
         examples = [
-            FunctionExample(
-                sql="SELECT audio.channels('/tmp/tone.wav')", description="Channel count of a WAV"
-            ),
+            FunctionExample(sql="SELECT audio.channels('/tmp/tone.wav')", description="Channel count of a WAV"),
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.Int32Array, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.channels, pa.int32())
 
 
@@ -185,6 +180,8 @@ class ChannelsBytesFunction(ScalarFunction):
     """``channels(blob)`` -- number of audio channels from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "channels"
         description = "Number of audio channels (1=mono, 2=stereo), from a BLOB of audio bytes"
         categories = ["audio", "metadata"]
@@ -196,9 +193,8 @@ class ChannelsBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.Int32Array, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.channels, pa.int32())
 
 
@@ -211,19 +207,18 @@ class TempoPathFunction(ScalarFunction):
     """``tempo(path)`` -- estimated tempo (BPM)."""
 
     class Meta:
+        """Function metadata."""
+
         name = "tempo"
         description = "Estimated tempo in BPM (heuristic), from a file path"
         categories = ["audio", "rhythm"]
         examples = [
-            FunctionExample(
-                sql="SELECT audio.tempo('/tmp/click.wav')", description="Estimated BPM of a track"
-            ),
+            FunctionExample(sql="SELECT audio.tempo('/tmp/click.wav')", description="Estimated BPM of a track"),
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.tempo, pa.float64())
 
 
@@ -231,6 +226,8 @@ class TempoBytesFunction(ScalarFunction):
     """``tempo(blob)`` -- estimated tempo (BPM) from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "tempo"
         description = "Estimated tempo in BPM (heuristic), from a BLOB of audio bytes"
         categories = ["audio", "rhythm"]
@@ -242,9 +239,8 @@ class TempoBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.tempo, pa.float64())
 
 
@@ -257,6 +253,8 @@ class RmsEnergyPathFunction(ScalarFunction):
     """``rms_energy(path)`` -- mean RMS energy."""
 
     class Meta:
+        """Function metadata."""
+
         name = "rms_energy"
         description = "Mean root-mean-square energy of the signal, from a file path"
         categories = ["audio", "energy"]
@@ -265,9 +263,8 @@ class RmsEnergyPathFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.rms_energy, pa.float64())
 
 
@@ -275,6 +272,8 @@ class RmsEnergyBytesFunction(ScalarFunction):
     """``rms_energy(blob)`` -- mean RMS energy from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "rms_energy"
         description = "Mean root-mean-square energy of the signal, from a BLOB of audio bytes"
         categories = ["audio", "energy"]
@@ -286,9 +285,8 @@ class RmsEnergyBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.rms_energy, pa.float64())
 
 
@@ -301,6 +299,8 @@ class ZeroCrossingRatePathFunction(ScalarFunction):
     """``zero_crossing_rate(path)`` -- mean zero-crossing rate."""
 
     class Meta:
+        """Function metadata."""
+
         name = "zero_crossing_rate"
         description = "Mean zero-crossing rate (fraction of sign changes), from a file path"
         categories = ["audio", "spectral"]
@@ -309,9 +309,8 @@ class ZeroCrossingRatePathFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.zero_crossing_rate, pa.float64())
 
 
@@ -319,6 +318,8 @@ class ZeroCrossingRateBytesFunction(ScalarFunction):
     """``zero_crossing_rate(blob)`` -- mean zero-crossing rate from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "zero_crossing_rate"
         description = "Mean zero-crossing rate (fraction of sign changes), from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
@@ -330,9 +331,8 @@ class ZeroCrossingRateBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.zero_crossing_rate, pa.float64())
 
 
@@ -345,6 +345,8 @@ class SpectralCentroidPathFunction(ScalarFunction):
     """``spectral_centroid(path)`` -- mean spectral centroid (Hz)."""
 
     class Meta:
+        """Function metadata."""
+
         name = "spectral_centroid"
         description = "Mean spectral centroid in Hz (spectrum centre of mass), from a file path"
         categories = ["audio", "spectral"]
@@ -355,9 +357,8 @@ class SpectralCentroidPathFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.spectral_centroid, pa.float64())
 
 
@@ -365,6 +366,8 @@ class SpectralCentroidBytesFunction(ScalarFunction):
     """``spectral_centroid(blob)`` -- mean spectral centroid (Hz) from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "spectral_centroid"
         description = "Mean spectral centroid in Hz (spectrum centre of mass), from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
@@ -376,9 +379,8 @@ class SpectralCentroidBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.spectral_centroid, pa.float64())
 
 
@@ -391,6 +393,8 @@ class SpectralBandwidthPathFunction(ScalarFunction):
     """``spectral_bandwidth(path)`` -- mean spectral bandwidth (Hz)."""
 
     class Meta:
+        """Function metadata."""
+
         name = "spectral_bandwidth"
         description = "Mean spectral bandwidth in Hz, from a file path"
         categories = ["audio", "spectral"]
@@ -401,9 +405,8 @@ class SpectralBandwidthPathFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.spectral_bandwidth, pa.float64())
 
 
@@ -411,6 +414,8 @@ class SpectralBandwidthBytesFunction(ScalarFunction):
     """``spectral_bandwidth(blob)`` -- mean spectral bandwidth (Hz) from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "spectral_bandwidth"
         description = "Mean spectral bandwidth in Hz, from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
@@ -422,9 +427,8 @@ class SpectralBandwidthBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.DoubleArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.spectral_bandwidth, pa.float64())
 
 
@@ -440,6 +444,8 @@ class MfccPathFunction(ScalarFunction):
     """``mfcc(path)`` -- mean of each of 13 MFCCs."""
 
     class Meta:
+        """Function metadata."""
+
         name = "mfcc"
         description = "Mean of each of 13 MFCC coefficients, from a file path"
         categories = ["audio", "spectral"]
@@ -451,6 +457,7 @@ class MfccPathFunction(ScalarFunction):
     def compute(
         cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
     ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+        """Map each input row to its output value."""
         return _map_path(path, features.mfcc, _MFCC_LIST)
 
 
@@ -458,6 +465,8 @@ class MfccPathNFunction(ScalarFunction):
     """``mfcc(path, n)`` -- mean of each of ``n`` MFCCs."""
 
     class Meta:
+        """Function metadata."""
+
         name = "mfcc"
         description = "Mean of each of n MFCC coefficients, from a file path"
         categories = ["audio", "spectral"]
@@ -471,6 +480,7 @@ class MfccPathNFunction(ScalarFunction):
         path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)],
         n: Annotated[int, ConstParam(_N_DOC)],
     ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+        """Map each input row to its output value."""
         return _map_path(path, lambda a: features.mfcc(a, n), _MFCC_LIST)
 
 
@@ -478,6 +488,8 @@ class MfccBytesFunction(ScalarFunction):
     """``mfcc(blob)`` -- mean of each of 13 MFCCs from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "mfcc"
         description = "Mean of each of 13 MFCC coefficients, from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
@@ -492,6 +504,7 @@ class MfccBytesFunction(ScalarFunction):
     def compute(
         cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
     ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.mfcc, _MFCC_LIST)
 
 
@@ -499,6 +512,8 @@ class MfccBytesNFunction(ScalarFunction):
     """``mfcc(blob, n)`` -- mean of each of ``n`` MFCCs from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "mfcc"
         description = "Mean of each of n MFCC coefficients, from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
@@ -515,6 +530,7 @@ class MfccBytesNFunction(ScalarFunction):
         blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)],
         n: Annotated[int, ConstParam(_N_DOC)],
     ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, lambda a: features.mfcc(a, n), _MFCC_LIST)
 
 
@@ -527,6 +543,8 @@ class EstimatedKeyPathFunction(ScalarFunction):
     """``estimated_key(path)`` -- chroma-based key estimate (heuristic)."""
 
     class Meta:
+        """Function metadata."""
+
         name = "estimated_key"
         description = "Heuristic chroma-based musical key estimate, e.g. 'C major', from a file path"
         categories = ["audio", "harmony"]
@@ -535,9 +553,8 @@ class EstimatedKeyPathFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.StringArray, Returns()]:
+    def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.StringArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_path(path, features.estimated_key, pa.string())
 
 
@@ -545,10 +562,10 @@ class EstimatedKeyBytesFunction(ScalarFunction):
     """``estimated_key(blob)`` -- chroma-based key estimate from raw bytes."""
 
     class Meta:
+        """Function metadata."""
+
         name = "estimated_key"
-        description = (
-            "Heuristic chroma-based musical key estimate, e.g. 'C major', from a BLOB of audio bytes"
-        )
+        description = "Heuristic chroma-based musical key estimate, e.g. 'C major', from a BLOB of audio bytes"
         categories = ["audio", "harmony"]
         examples = [
             FunctionExample(
@@ -558,9 +575,8 @@ class EstimatedKeyBytesFunction(ScalarFunction):
         ]
 
     @classmethod
-    def compute(
-        cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.StringArray, Returns()]:
+    def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.StringArray, Returns()]:
+        """Map each input row to its output value."""
         return _map_bytes(blob, features.estimated_key, pa.string())
 
 
