@@ -1,14 +1,11 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python",
+#     "vgi-python>=0.8.3",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
 # ]
-#
-# [tool.uv.sources]
-# vgi-python = { path = "../vgi-python" }
 # ///
 """VGI worker exposing librosa audio-feature extraction to SQL.
 
