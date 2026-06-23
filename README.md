@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="docs/vgi-logo.png" alt="Vector Gateway Interface (VGI)" width="320">
+</p>
+
+<p align="center"><em>A <a href="https://query.farm">Query.Farm</a> VGI worker for DuckDB.</em></p>
+
 # vgi-audio
 
 [![CI](https://github.com/Query-farm/vgi-audio/actions/workflows/ci.yml/badge.svg)](https://github.com/Query-farm/vgi-audio/actions/workflows/ci.yml)
@@ -124,3 +130,12 @@ uv run ruff check . && uv run mypy vgi_audio/
 Test audio is generated deterministically in-process (numpy sine tones / click
 tracks written to in-memory WAV via `soundfile`); a couple of tiny committed WAV
 fixtures under `test/sql/data/` drive the SQL E2E.
+
+---
+
+## Authorship & License
+
+Written by [Query.Farm](https://query.farm) — every VGI worker is designed and built by Query.Farm.
+
+Copyright 2026 Query Farm LLC - https://query.farm
+
