@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.8.3",
+#     "vgi-python[http]>=0.8.4",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
@@ -48,13 +48,61 @@ _FUNCTIONS: list[type] = [
     *TABLE_FUNCTIONS,
 ]
 
+_CATALOG_DESCRIPTION_LLM = (
+    "Extract acoustic and musical features from audio files or raw audio bytes directly in SQL. "
+    "Scalars return per-file metadata (duration, sample_rate, channels) and signal/spectral/rhythmic "
+    "features (tempo in BPM, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
+    "mfcc as DOUBLE[], and a heuristic estimated_key like 'C major'). Table functions return beat onset "
+    "times (beats) and combined metadata (audio_info). Every function accepts either a VARCHAR filesystem "
+    "path the worker opens, or a BLOB of raw audio bytes. Use it to index, filter, or cluster audio "
+    "collections by their acoustic properties without leaving SQL."
+)
+
+_CATALOG_DESCRIPTION_MD = (
+    "# audio\n\n"
+    "librosa-powered audio-feature extraction for DuckDB over Apache Arrow.\n\n"
+    "Every function takes either a `VARCHAR` filesystem path or a `BLOB` of raw audio bytes "
+    "(WAV/FLAC/OGG decode natively; compressed formats need `ffmpeg`). Undecodable or hostile "
+    "input yields `NULL` / no rows rather than crashing.\n\n"
+    "**Scalars:** `duration`, `sample_rate`, `channels`, `tempo`, `rms_energy`, "
+    "`zero_crossing_rate`, `spectral_centroid`, `spectral_bandwidth`, `mfcc`, `estimated_key`.\n\n"
+    "**Table functions:** `beats` (beat onset times), `audio_info` (duration / sample_rate / channels)."
+)
+
+_SCHEMA_DESCRIPTION_LLM = (
+    "Audio-feature functions: per-file metadata (duration, sample_rate, channels), signal/spectral/"
+    "rhythmic scalars (tempo, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
+    "mfcc, estimated_key), and table functions for beat onset times (beats) and combined metadata "
+    "(audio_info). Inputs are a VARCHAR path or a BLOB of audio bytes."
+)
+
+_SCHEMA_DESCRIPTION_MD = (
+    "librosa audio-feature extraction functions (duration, tempo, MFCC, key, spectral features, "
+    "beats, ...) over Apache Arrow."
+)
+
 _AUDIO_CATALOG = Catalog(
     name="audio",
     default_schema="main",
+    comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL.",
+    source_url="https://github.com/Query-farm/vgi-audio",
+    tags={
+        "vgi.description_llm": _CATALOG_DESCRIPTION_LLM,
+        "vgi.description_md": _CATALOG_DESCRIPTION_MD,
+        "vgi.author": "Query.Farm",
+        "vgi.copyright": "Copyright 2026 Query Farm LLC - https://query.farm",
+        "vgi.license": "MIT",
+        "vgi.support_contact": "https://github.com/Query-farm/vgi-audio/issues",
+        "vgi.support_policy_url": "https://github.com/Query-farm/vgi-audio/blob/main/README.md",
+    },
     schemas=[
         Schema(
             name="main",
             comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL",
+            tags={
+                "vgi.description_llm": _SCHEMA_DESCRIPTION_LLM,
+                "vgi.description_md": _SCHEMA_DESCRIPTION_MD,
+            },
             functions=list(_FUNCTIONS),
         ),
     ],

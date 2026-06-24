@@ -66,6 +66,13 @@ _BEATS_SCHEMA = pa.schema(
     ]
 )
 
+_BEATS_COLUMNS_MD = (
+    "| column | type | description |\n"
+    "|---|---|---|\n"
+    "| `seq` | BIGINT | 0-based beat index (ascending). |\n"
+    "| `time` | DOUBLE | Beat onset time in seconds. |"
+)
+
 
 def _emit_beats(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     times = features.beat_times(audio)
@@ -93,6 +100,7 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
         name = "beats"
         description = "Beat onset times (seq, time) of an audio file path"
         categories = ["audio", "rhythm"]
+        tags = {"vgi.columns_md": _BEATS_COLUMNS_MD}
         examples = [
             FunctionExample(
                 sql="SELECT * FROM audio.beats('/tmp/click.wav')",
@@ -124,6 +132,7 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
         name = "beats"
         description = "Beat onset times (seq, time) of a BLOB of audio bytes"
         categories = ["audio", "rhythm"]
+        tags = {"vgi.columns_md": _BEATS_COLUMNS_MD}
         examples = [
             FunctionExample(
                 sql="SELECT * FROM audio.beats((SELECT content FROM read_blob('click.wav')))",
@@ -169,6 +178,14 @@ _INFO_SCHEMA = pa.schema(
     ]
 )
 
+_INFO_COLUMNS_MD = (
+    "| column | type | description |\n"
+    "|---|---|---|\n"
+    "| `duration` | DOUBLE | Duration in seconds. |\n"
+    "| `sample_rate` | INTEGER | Native sample rate in Hz. |\n"
+    "| `channels` | INTEGER | Number of audio channels (1=mono, 2=stereo). |"
+)
+
 
 def _emit_info(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     info = features.audio_info(audio)
@@ -204,6 +221,7 @@ class AudioInfoPathFunction(TableFunctionGenerator[_InfoPathArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of an audio file path"
         categories = ["audio", "metadata"]
+        tags = {"vgi.columns_md": _INFO_COLUMNS_MD}
         examples = [
             FunctionExample(
                 sql="SELECT * FROM audio.audio_info('/tmp/tone.wav')",
@@ -235,6 +253,7 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of a BLOB of audio bytes"
         categories = ["audio", "metadata"]
+        tags = {"vgi.columns_md": _INFO_COLUMNS_MD}
         examples = [
             FunctionExample(
                 sql="SELECT * FROM audio.audio_info((SELECT content FROM read_blob('tone.wav')))",
