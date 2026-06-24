@@ -32,12 +32,34 @@ from vgi.table_function import (
 )
 from vgi_rpc.rpc import OutputCollector
 
-from . import features
+from . import features, meta
+from ._example_audio import CLICK_WAV_B64, TONE_WAV_B64
 from .features import AudioInput
 from .schema_utils import field
 
 _PATH_ARG: Arg[str] = Arg(0, arrow_type=pa.string(), doc="Filesystem path to an audio file the worker will open.")
 _BLOB_ARG: Arg[bytes] = Arg(0, arrow_type=pa.binary(), doc="Raw audio bytes (e.g. the contents of a WAV/FLAC file).")
+
+_SRC = "vgi_audio/tables.py"
+
+# Inline self-contained example inputs (see ``vgi_audio._example_audio``): a
+# click track with clear onsets for ``beats`` (so it emits multiple rows) and a
+# tone for ``audio_info``. ``from_base64(...)`` yields the ``BLOB`` overload's
+# input, so the strict linter can EXECUTE every example with no file on disk.
+_CLICK_BLOB_SQL = f"from_base64('{CLICK_WAV_B64}')"
+_TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
+
+# VGI509: at least one object ships guaranteed-runnable executable examples.
+# Each is fully self-contained (inline blob, catalog-qualified) so VGI906 can
+# run it against the live worker.
+_EXECUTABLE_EXAMPLES = (
+    "["
+    '{"description": "Beat onset times of an inline 120 BPM click track.", '
+    f'"sql": "SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq"}},'
+    '{"description": "Duration / sample rate / channels of an inline WAV tone.", '
+    f'"sql": "SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})"}}'
+    "]"
+)
 
 
 # ===========================================================================
@@ -73,6 +95,35 @@ _BEATS_COLUMNS_MD = (
     "| `time` | DOUBLE | Beat onset time in seconds. |"
 )
 
+_TAGS_BEATS = meta.object_tags(
+    title="Beat Onset Times Table",
+    doc_llm=(
+        "## audio.beats\n\n"
+        "A **table function** that returns the **detected beat onset times** of a "
+        "recording, one row per beat: `(seq BIGINT, time DOUBLE)`. Accepts a "
+        "`VARCHAR` path or a `BLOB` of audio bytes.\n\n"
+        "**When to use.** Build a beat grid for visualisation or editing, segment "
+        "a track on its beats, count beats, or align events to the rhythm.\n\n"
+        "**Output.** `seq` is the 0-based, ascending beat index; `time` is the "
+        "onset in seconds. Beats are found by librosa's beat tracker on a bounded "
+        "mono signal -- a **heuristic**, strongest on material with a clear "
+        "pulse. Returns **no rows** for `NULL`/undecodable input or audio with no "
+        "detectable beat; it never raises."
+    ),
+    doc_md=(
+        "# beats\n\n"
+        "Table function -> detected **beat onset times**, one row per beat.\n\n"
+        f"{_BEATS_COLUMNS_MD}\n\n"
+        "```sql\n"
+        "SELECT seq, time FROM audio.beats('/music/track.wav') ORDER BY seq;\n"
+        "```\n\n"
+        "Heuristic beat tracking; **no rows** for undecodable input or audio "
+        "without a clear pulse."
+    ),
+    keywords="beats, beat tracking, onsets, beat grid, rhythm, downbeat, tempo, timeline",
+    relative_path=_SRC,
+)
+
 
 def _emit_beats(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     times = features.beat_times(audio)
@@ -100,11 +151,15 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
         name = "beats"
         description = "Beat onset times (seq, time) of an audio file path"
         categories = ["audio", "rhythm"]
-        tags = {"vgi.columns_md": _BEATS_COLUMNS_MD}
+        tags = {
+            **_TAGS_BEATS,
+            "vgi.result_columns_md": _BEATS_COLUMNS_MD,
+            "vgi.executable_examples": _EXECUTABLE_EXAMPLES,
+        }
         examples = [
             FunctionExample(
-                sql="SELECT * FROM audio.beats('/tmp/click.wav')",
-                description="Beat onset times of a click track",
+                sql=f"SELECT seq, time FROM audio.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+                description="Beat onset times of an inline click track",
             ),
         ]
 
@@ -132,11 +187,11 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
         name = "beats"
         description = "Beat onset times (seq, time) of a BLOB of audio bytes"
         categories = ["audio", "rhythm"]
-        tags = {"vgi.columns_md": _BEATS_COLUMNS_MD}
+        tags = {**_TAGS_BEATS, "vgi.result_columns_md": _BEATS_COLUMNS_MD}
         examples = [
             FunctionExample(
-                sql="SELECT * FROM audio.beats((SELECT content FROM read_blob('click.wav')))",
-                description="Beat onset times from audio bytes",
+                sql=f"SELECT seq, time FROM audio.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+                description="Beat onset times from an inline click track (BLOB)",
             ),
         ]
 
@@ -186,6 +241,34 @@ _INFO_COLUMNS_MD = (
     "| `channels` | INTEGER | Number of audio channels (1=mono, 2=stereo). |"
 )
 
+_TAGS_INFO = meta.object_tags(
+    title="Combined Audio Metadata Row",
+    doc_llm=(
+        "## audio.audio_info\n\n"
+        "A **table function** returning a recording's core metadata in a single "
+        "row: `(duration DOUBLE, sample_rate INTEGER, channels INTEGER)`. Accepts "
+        "a `VARCHAR` path or a `BLOB` of audio bytes.\n\n"
+        "**When to use.** Get duration, sample rate, and channel count in one "
+        "call instead of three separate scalars -- handy when ingesting a batch "
+        "of files into a metadata table.\n\n"
+        "**Output.** Exactly one row on success. Returns **no rows** for "
+        "`NULL`/undecodable input (it never raises). Equivalent to selecting "
+        "`duration`, `sample_rate`, and `channels` together."
+    ),
+    doc_md=(
+        "# audio_info\n\n"
+        "Table function -> one row of core **audio metadata**.\n\n"
+        f"{_INFO_COLUMNS_MD}\n\n"
+        "```sql\n"
+        "SELECT * FROM audio.audio_info('/music/track.wav');\n"
+        "```\n\n"
+        "One row on success; **no rows** for undecodable input. A one-shot "
+        "alternative to the `duration` / `sample_rate` / `channels` scalars."
+    ),
+    keywords="audio info, metadata, duration, sample rate, channels, probe, mediainfo, summary",
+    relative_path=_SRC,
+)
+
 
 def _emit_info(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
     info = features.audio_info(audio)
@@ -221,11 +304,11 @@ class AudioInfoPathFunction(TableFunctionGenerator[_InfoPathArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of an audio file path"
         categories = ["audio", "metadata"]
-        tags = {"vgi.columns_md": _INFO_COLUMNS_MD}
+        tags = {**_TAGS_INFO, "vgi.result_columns_md": _INFO_COLUMNS_MD}
         examples = [
             FunctionExample(
-                sql="SELECT * FROM audio.audio_info('/tmp/tone.wav')",
-                description="Metadata of a WAV file",
+                sql=f"SELECT duration, sample_rate, channels FROM audio.audio_info({_TONE_BLOB_SQL})",
+                description="Metadata of an inline WAV tone",
             ),
         ]
 
@@ -253,11 +336,11 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of a BLOB of audio bytes"
         categories = ["audio", "metadata"]
-        tags = {"vgi.columns_md": _INFO_COLUMNS_MD}
+        tags = {**_TAGS_INFO, "vgi.result_columns_md": _INFO_COLUMNS_MD}
         examples = [
             FunctionExample(
-                sql="SELECT * FROM audio.audio_info((SELECT content FROM read_blob('tone.wav')))",
-                description="Metadata from audio bytes",
+                sql=f"SELECT duration, sample_rate, channels FROM audio.audio_info({_TONE_BLOB_SQL})",
+                description="Metadata from an inline WAV tone (BLOB)",
             ),
         ]
 

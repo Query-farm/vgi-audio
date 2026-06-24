@@ -40,8 +40,25 @@ from vgi import Worker
 from vgi.catalog import Catalog, Schema
 
 from vgi_audio import features
+from vgi_audio._example_audio import CLICK_WAV_B64, TONE_WAV_B64
 from vgi_audio.scalars import SCALAR_FUNCTIONS
 from vgi_audio.tables import TABLE_FUNCTIONS
+
+# Inline self-contained blobs (see vgi_audio._example_audio) so the schema's
+# representative example queries EXECUTE against the live worker -- a bare path
+# would return no rows in a fresh process.
+_TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
+_CLICK_BLOB_SQL = f"from_base64('{CLICK_WAV_B64}')"
+
+_SCHEMA_EXAMPLE_QUERIES = (
+    f"SELECT audio.main.duration({_TONE_BLOB_SQL}) AS seconds;\n"
+    f"SELECT audio.main.sample_rate({_TONE_BLOB_SQL}) AS hz;\n"
+    f"SELECT audio.main.tempo({_CLICK_BLOB_SQL}) AS bpm;\n"
+    f"SELECT audio.main.spectral_centroid({_TONE_BLOB_SQL}) AS centroid_hz;\n"
+    f"SELECT audio.main.estimated_key({_TONE_BLOB_SQL}) AS musical_key;\n"
+    f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq;\n"
+    f"SELECT * FROM audio.main.audio_info({_TONE_BLOB_SQL});"
+)
 
 _FUNCTIONS: list[type] = [
     *SCALAR_FUNCTIONS,
@@ -87,8 +104,14 @@ _AUDIO_CATALOG = Catalog(
     comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL.",
     source_url="https://github.com/Query-farm/vgi-audio",
     tags={
-        "vgi.description_llm": _CATALOG_DESCRIPTION_LLM,
-        "vgi.description_md": _CATALOG_DESCRIPTION_MD,
+        "vgi.title": "Audio Feature Extraction",
+        "vgi.keywords": (
+            "audio, sound, music, librosa, feature extraction, duration, sample rate, channels, "
+            "tempo, bpm, rms, energy, loudness, zero crossing rate, spectral centroid, "
+            "spectral bandwidth, mfcc, key, beats, audio analysis, signal processing"
+        ),
+        "vgi.doc_llm": _CATALOG_DESCRIPTION_LLM,
+        "vgi.doc_md": _CATALOG_DESCRIPTION_MD,
         "vgi.author": "Query.Farm",
         "vgi.copyright": "Copyright 2026 Query Farm LLC - https://query.farm",
         "vgi.license": "MIT",
@@ -100,8 +123,21 @@ _AUDIO_CATALOG = Catalog(
             name="main",
             comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL",
             tags={
-                "vgi.description_llm": _SCHEMA_DESCRIPTION_LLM,
-                "vgi.description_md": _SCHEMA_DESCRIPTION_MD,
+                "vgi.title": "Audio Features — main",
+                "vgi.keywords": (
+                    "audio, librosa, duration, sample rate, channels, tempo, bpm, rms, energy, "
+                    "zero crossing rate, spectral centroid, spectral bandwidth, mfcc, "
+                    "estimated key, beats, audio_info, signal processing, music information retrieval"
+                ),
+                # VGI123 classifying tags use BARE keys (not vgi.-namespaced) for faceting.
+                "domain": "audio",
+                "category": "feature-extraction",
+                "topic": "music-information-retrieval",
+                "vgi.source_url": "https://github.com/Query-farm/vgi-audio/blob/main/audio_worker.py",
+                "vgi.doc_llm": _SCHEMA_DESCRIPTION_LLM,
+                "vgi.doc_md": _SCHEMA_DESCRIPTION_MD,
+                # VGI506 representative, runnable example queries for the schema.
+                "vgi.example_queries": _SCHEMA_EXAMPLE_QUERIES,
             },
             functions=list(_FUNCTIONS),
         ),
