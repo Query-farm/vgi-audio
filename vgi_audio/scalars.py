@@ -78,8 +78,6 @@ def _map_bytes[T](arr: pa.BinaryArray, fn: Callable[[AudioInput | None], T], arr
 _PATH_DOC = "Filesystem path to an audio file the worker will open."
 _BLOB_DOC = "Raw audio bytes (e.g. the contents of a WAV/FLAC file)."
 
-_SRC = "vgi_audio/scalars.py"
-
 # ---------------------------------------------------------------------------
 # Per-object discovery/description tags (VGI112/113/124/126/128), one set per
 # logical feature. Both the path and bytes overloads of a feature carry the same
@@ -113,8 +111,7 @@ _TAGS_DURATION = meta.object_tags(
         "Reads the native frame count when available, else decodes to measure. "
         "`NULL` for undecodable or `NULL` input."
     ),
-    keywords="duration, length, seconds, runtime, playtime, audio length, clip length, time",
-    relative_path=_SRC,
+    keywords=["duration", "length", "seconds", "runtime", "playtime", "audio length", "clip length", "time"],
 )
 
 _TAGS_SAMPLE_RATE = meta.object_tags(
@@ -137,8 +134,7 @@ _TAGS_SAMPLE_RATE = meta.object_tags(
         "```\n\n"
         "Taken from the file header where available. `NULL` for undecodable input."
     ),
-    keywords="sample rate, samplerate, hz, frequency, sampling, 44100, 48000, khz",
-    relative_path=_SRC,
+    keywords=["sample rate", "samplerate", "hz", "frequency", "sampling", "44100", "48000", "khz"],
 )
 
 _TAGS_CHANNELS = meta.object_tags(
@@ -162,8 +158,7 @@ _TAGS_CHANNELS = meta.object_tags(
         "```\n\n"
         "From the file header where available. `NULL` for undecodable input."
     ),
-    keywords="channels, mono, stereo, surround, channel count, layout, multichannel",
-    relative_path=_SRC,
+    keywords=["channels", "mono", "stereo", "surround", "channel count", "layout", "multichannel"],
 )
 
 _TAGS_TEMPO = meta.object_tags(
@@ -189,8 +184,7 @@ _TAGS_TEMPO = meta.object_tags(
         "> Heuristic: may report a half/double-time multiple, and is unreliable "
         "on audio without a steady beat. `NULL` for undecodable input."
     ),
-    keywords="tempo, bpm, beats per minute, speed, pace, rhythm, beat",
-    relative_path=_SRC,
+    keywords=["tempo", "bpm", "beats per minute", "speed", "pace", "rhythm", "beat"],
 )
 
 _TAGS_RMS = meta.object_tags(
@@ -215,8 +209,7 @@ _TAGS_RMS = meta.object_tags(
         "Higher means louder; near `0` means near-silent. `NULL` for undecodable "
         "input."
     ),
-    keywords="rms, energy, loudness, level, amplitude, volume, power, silence",
-    relative_path=_SRC,
+    keywords=["rms", "energy", "loudness", "level", "amplitude", "volume", "power", "silence"],
 )
 
 _TAGS_ZCR = meta.object_tags(
@@ -241,8 +234,7 @@ _TAGS_ZCR = meta.object_tags(
         "High for noisy/percussive audio, low for smooth tones. `NULL` for "
         "undecodable input."
     ),
-    keywords="zero crossing rate, zcr, noisiness, timbre, sign changes, percussive, voiced",
-    relative_path=_SRC,
+    keywords=["zero crossing rate", "zcr", "noisiness", "timbre", "sign changes", "percussive", "voiced"],
 )
 
 _TAGS_CENTROID = meta.object_tags(
@@ -265,8 +257,7 @@ _TAGS_CENTROID = meta.object_tags(
         "```\n\n"
         "Higher = brighter/sharper timbre. `NULL` for undecodable input."
     ),
-    keywords="spectral centroid, brightness, timbre, center of mass, spectrum, sharpness",
-    relative_path=_SRC,
+    keywords=["spectral centroid", "brightness", "timbre", "center of mass", "spectrum", "sharpness"],
 )
 
 _TAGS_BANDWIDTH = meta.object_tags(
@@ -291,8 +282,7 @@ _TAGS_BANDWIDTH = meta.object_tags(
         "Small = tonal/narrow-band; large = broadband/noisy. `NULL` for "
         "undecodable input."
     ),
-    keywords="spectral bandwidth, spread, spectrum width, timbre, broadband, narrowband",
-    relative_path=_SRC,
+    keywords=["spectral bandwidth", "spread", "spectrum width", "timbre", "broadband", "narrowband"],
 )
 
 _TAGS_MFCC = meta.object_tags(
@@ -320,8 +310,7 @@ _TAGS_MFCC = meta.object_tags(
         "Optional `n` sets the coefficient count (default 13). `NULL` for "
         "undecodable input. Great as a similarity/ML feature vector."
     ),
-    keywords="mfcc, cepstral, timbre, feature vector, fingerprint, embedding, similarity, ml",
-    relative_path=_SRC,
+    keywords=["mfcc", "cepstral", "timbre", "feature vector", "fingerprint", "embedding", "similarity", "ml"],
 )
 
 _TAGS_KEY = meta.object_tags(
@@ -348,8 +337,7 @@ _TAGS_KEY = meta.object_tags(
         "> Krumhansl-Schmuckler chroma heuristic -- a hint, not ground truth. "
         "May confuse relative major/minor. `NULL` for undecodable input."
     ),
-    keywords="key, musical key, tonality, major, minor, chroma, harmonic, camelot, scale",
-    relative_path=_SRC,
+    keywords=["key", "musical key", "tonality", "major", "minor", "chroma", "harmonic", "camelot", "scale"],
 )
 
 

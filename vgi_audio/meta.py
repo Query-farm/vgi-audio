@@ -9,30 +9,36 @@ table:
   consumers (what it does, when to use it, inputs/outputs, edge cases).
 * ``vgi.doc_md`` (VGI113) -- a Markdown narrative for human docs
   (overview + usage + notes).
-* ``vgi.keywords`` (VGI126) -- comma-separated search terms / synonyms.
-* ``vgi.source_url`` (VGI128) -- link to the file that implements the object.
+* ``vgi.keywords`` (VGI126/VGI138) -- search terms / synonyms, serialised as a
+  **JSON array of strings** (e.g. ``["audio","tempo"]``), not a comma-separated
+  string.
 
-:func:`source_url` builds the canonical GitHub blob URL and :func:`object_tags`
-assembles the five-tag dict each function/table merges into its ``Meta.tags``.
+``vgi.source_url`` is intentionally **not** set per object (VGI139): the
+catalog-level ``source_url`` is the single source-of-truth link, so duplicating
+it on every function/table is redundant and is dropped here.
+
+:func:`keywords_json` serialises a keyword list and :func:`object_tags`
+assembles the per-object tag dict each function/table merges into its
+``Meta.tags``.
 """
 
 from __future__ import annotations
 
-#: Base GitHub blob URL for source files in this repo (pinned to ``main``).
-SOURCE_BASE = "https://github.com/Query-farm/vgi-audio/blob/main"
+import json
+from collections.abc import Sequence
 
 
-def source_url(relative_path: str) -> str:
-    """Build the ``vgi.source_url`` for a repo-relative source file.
+def keywords_json(keywords: Sequence[str]) -> str:
+    """Serialise search keywords as a JSON array of strings (VGI138).
 
     Args:
-        relative_path: Path of the implementing file relative to the repo root,
-            e.g. ``"vgi_audio/scalars.py"``.
+        keywords: The individual search terms / synonyms for the object.
 
     Returns:
-        The canonical GitHub blob URL for that file on ``main``.
+        A JSON array string such as ``["audio", "tempo"]`` suitable for the
+        ``vgi.keywords`` tag value.
     """
-    return f"{SOURCE_BASE}/{relative_path}"
+    return json.dumps(list(keywords))
 
 
 def object_tags(
@@ -40,18 +46,16 @@ def object_tags(
     title: str,
     doc_llm: str,
     doc_md: str,
-    keywords: str,
-    relative_path: str,
+    keywords: Sequence[str],
 ) -> dict[str, str]:
-    """Build the five standard per-object discovery/description tags.
+    """Build the standard per-object discovery/description tags.
 
     Args:
         title: Human-friendly display name (``vgi.title``); must differ from the
             object's machine name.
         doc_llm: Markdown narrative for LLM/agent audiences.
         doc_md: Markdown narrative for human documentation.
-        keywords: Comma-separated search terms / synonyms.
-        relative_path: Implementing file relative to the repo root.
+        keywords: Search terms / synonyms, serialised as a JSON array (VGI138).
 
     Returns:
         A tag dict ready to merge into a function/table ``Meta.tags``.
@@ -60,6 +64,5 @@ def object_tags(
         "vgi.title": title,
         "vgi.doc_llm": doc_llm,
         "vgi.doc_md": doc_md,
-        "vgi.keywords": keywords,
-        "vgi.source_url": source_url(relative_path),
+        "vgi.keywords": keywords_json(keywords),
     }

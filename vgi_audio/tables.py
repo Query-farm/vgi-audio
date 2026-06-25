@@ -40,8 +40,6 @@ from .schema_utils import field
 _PATH_ARG: Arg[str] = Arg(0, arrow_type=pa.string(), doc="Filesystem path to an audio file the worker will open.")
 _BLOB_ARG: Arg[bytes] = Arg(0, arrow_type=pa.binary(), doc="Raw audio bytes (e.g. the contents of a WAV/FLAC file).")
 
-_SRC = "vgi_audio/tables.py"
-
 # Inline self-contained example inputs (see ``vgi_audio._example_audio``): a
 # click track with clear onsets for ``beats`` (so it emits multiple rows) and a
 # tone for ``audio_info``. ``from_base64(...)`` yields the ``BLOB`` overload's
@@ -120,8 +118,7 @@ _TAGS_BEATS = meta.object_tags(
         "Heuristic beat tracking; **no rows** for undecodable input or audio "
         "without a clear pulse."
     ),
-    keywords="beats, beat tracking, onsets, beat grid, rhythm, downbeat, tempo, timeline",
-    relative_path=_SRC,
+    keywords=["beats", "beat tracking", "onsets", "beat grid", "rhythm", "downbeat", "tempo", "timeline"],
 )
 
 
@@ -265,8 +262,7 @@ _TAGS_INFO = meta.object_tags(
         "One row on success; **no rows** for undecodable input. A one-shot "
         "alternative to the `duration` / `sample_rate` / `channels` scalars."
     ),
-    keywords="audio info, metadata, duration, sample rate, channels, probe, mediainfo, summary",
-    relative_path=_SRC,
+    keywords=["audio info", "metadata", "duration", "sample rate", "channels", "probe", "mediainfo", "summary"],
 )
 
 

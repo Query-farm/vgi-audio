@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.8.4",
+#     "vgi-python[http]>=0.8.5",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
@@ -35,6 +35,8 @@ Usage:
 """
 
 from __future__ import annotations
+
+import json
 
 from vgi import Worker
 from vgi.catalog import Catalog, Schema
@@ -94,8 +96,15 @@ _SCHEMA_DESCRIPTION_LLM = (
 )
 
 _SCHEMA_DESCRIPTION_MD = (
-    "librosa audio-feature extraction functions (duration, tempo, MFCC, key, spectral features, "
-    "beats, ...) over Apache Arrow."
+    "The `main` schema holds the librosa-powered audio-feature functions of the `audio` catalog. "
+    "Scalars return per-file metadata (`duration`, `sample_rate`, `channels`) and signal, spectral, "
+    "and rhythmic features (`tempo` in BPM, `rms_energy`, `zero_crossing_rate`, `spectral_centroid`, "
+    "`spectral_bandwidth`, `mfcc` as a `DOUBLE[]`, and a heuristic `estimated_key`). Table functions "
+    "return beat onset times (`beats`) and a one-row metadata summary (`audio_info`). Every function "
+    "accepts either a `VARCHAR` filesystem path the worker opens, or a `BLOB` of raw audio bytes; "
+    "WAV/FLAC/OGG decode natively while compressed formats need `ffmpeg`. Undecodable or hostile input "
+    "yields `NULL` / no rows rather than crashing. Use it to index, filter, or cluster audio collections "
+    "by acoustic properties without leaving SQL."
 )
 
 _AUDIO_CATALOG = Catalog(
@@ -105,10 +114,31 @@ _AUDIO_CATALOG = Catalog(
     source_url="https://github.com/Query-farm/vgi-audio",
     tags={
         "vgi.title": "Audio Feature Extraction",
-        "vgi.keywords": (
-            "audio, sound, music, librosa, feature extraction, duration, sample rate, channels, "
-            "tempo, bpm, rms, energy, loudness, zero crossing rate, spectral centroid, "
-            "spectral bandwidth, mfcc, key, beats, audio analysis, signal processing"
+        # VGI138: keywords must be a JSON array of strings, not a CSV string.
+        "vgi.keywords": json.dumps(
+            [
+                "audio",
+                "sound",
+                "music",
+                "librosa",
+                "feature extraction",
+                "duration",
+                "sample rate",
+                "channels",
+                "tempo",
+                "bpm",
+                "rms",
+                "energy",
+                "loudness",
+                "zero crossing rate",
+                "spectral centroid",
+                "spectral bandwidth",
+                "mfcc",
+                "key",
+                "beats",
+                "audio analysis",
+                "signal processing",
+            ]
         ),
         "vgi.doc_llm": _CATALOG_DESCRIPTION_LLM,
         "vgi.doc_md": _CATALOG_DESCRIPTION_MD,
@@ -124,16 +154,35 @@ _AUDIO_CATALOG = Catalog(
             comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL",
             tags={
                 "vgi.title": "Audio Features — main",
-                "vgi.keywords": (
-                    "audio, librosa, duration, sample rate, channels, tempo, bpm, rms, energy, "
-                    "zero crossing rate, spectral centroid, spectral bandwidth, mfcc, "
-                    "estimated key, beats, audio_info, signal processing, music information retrieval"
+                # VGI138: keywords must be a JSON array of strings, not a CSV string.
+                "vgi.keywords": json.dumps(
+                    [
+                        "audio",
+                        "librosa",
+                        "duration",
+                        "sample rate",
+                        "channels",
+                        "tempo",
+                        "bpm",
+                        "rms",
+                        "energy",
+                        "zero crossing rate",
+                        "spectral centroid",
+                        "spectral bandwidth",
+                        "mfcc",
+                        "estimated key",
+                        "beats",
+                        "audio_info",
+                        "signal processing",
+                        "music information retrieval",
+                    ]
                 ),
                 # VGI123 classifying tags use BARE keys (not vgi.-namespaced) for faceting.
                 "domain": "audio",
                 "category": "feature-extraction",
                 "topic": "music-information-retrieval",
-                "vgi.source_url": "https://github.com/Query-farm/vgi-audio/blob/main/audio_worker.py",
+                # VGI139: no per-object vgi.source_url -- the catalog's source_url
+                # is the single source-of-truth link.
                 "vgi.doc_llm": _SCHEMA_DESCRIPTION_LLM,
                 "vgi.doc_md": _SCHEMA_DESCRIPTION_MD,
                 # VGI506 representative, runnable example queries for the schema.
