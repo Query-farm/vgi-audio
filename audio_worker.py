@@ -79,6 +79,7 @@ _CATALOG_DESCRIPTION_LLM = (
 
 _CATALOG_DESCRIPTION_MD = (
     "# Audio Feature Extraction in SQL\n\n"
+    "![librosa logo](https://raw.githubusercontent.com/librosa/librosa/main/docs/img/librosa_logo_text.png)\n\n"
     "Extract tempo, MFCC, spectral, key, and beat features from audio files and raw audio "
     "bytes directly in DuckDB SQL — no separate audio pipeline required. The `audio` catalog "
     "turns music information retrieval (MIR) and digital signal processing primitives into "
