@@ -112,6 +112,7 @@ _TAGS_DURATION = meta.object_tags(
         "`NULL` for undecodable or `NULL` input."
     ),
     keywords=["duration", "length", "seconds", "runtime", "playtime", "audio length", "clip length", "time"],
+    category="metadata",
 )
 
 _TAGS_SAMPLE_RATE = meta.object_tags(
@@ -135,6 +136,7 @@ _TAGS_SAMPLE_RATE = meta.object_tags(
         "Taken from the file header where available. `NULL` for undecodable input."
     ),
     keywords=["sample rate", "samplerate", "hz", "frequency", "sampling", "44100", "48000", "khz"],
+    category="metadata",
 )
 
 _TAGS_CHANNELS = meta.object_tags(
@@ -159,6 +161,7 @@ _TAGS_CHANNELS = meta.object_tags(
         "From the file header where available. `NULL` for undecodable input."
     ),
     keywords=["channels", "mono", "stereo", "surround", "channel count", "layout", "multichannel"],
+    category="metadata",
 )
 
 _TAGS_TEMPO = meta.object_tags(
@@ -185,6 +188,7 @@ _TAGS_TEMPO = meta.object_tags(
         "on audio without a steady beat. `NULL` for undecodable input."
     ),
     keywords=["tempo", "bpm", "beats per minute", "speed", "pace", "rhythm", "beat"],
+    category="rhythm",
 )
 
 _TAGS_RMS = meta.object_tags(
@@ -210,6 +214,7 @@ _TAGS_RMS = meta.object_tags(
         "input."
     ),
     keywords=["rms", "energy", "loudness", "level", "amplitude", "volume", "power", "silence"],
+    category="loudness",
 )
 
 _TAGS_ZCR = meta.object_tags(
@@ -235,6 +240,7 @@ _TAGS_ZCR = meta.object_tags(
         "undecodable input."
     ),
     keywords=["zero crossing rate", "zcr", "noisiness", "timbre", "sign changes", "percussive", "voiced"],
+    category="spectral",
 )
 
 _TAGS_CENTROID = meta.object_tags(
@@ -258,6 +264,7 @@ _TAGS_CENTROID = meta.object_tags(
         "Higher = brighter/sharper timbre. `NULL` for undecodable input."
     ),
     keywords=["spectral centroid", "brightness", "timbre", "center of mass", "spectrum", "sharpness"],
+    category="spectral",
 )
 
 _TAGS_BANDWIDTH = meta.object_tags(
@@ -283,6 +290,7 @@ _TAGS_BANDWIDTH = meta.object_tags(
         "undecodable input."
     ),
     keywords=["spectral bandwidth", "spread", "spectrum width", "timbre", "broadband", "narrowband"],
+    category="spectral",
 )
 
 _TAGS_MFCC = meta.object_tags(
@@ -311,6 +319,7 @@ _TAGS_MFCC = meta.object_tags(
         "undecodable input. Great as a similarity/ML feature vector."
     ),
     keywords=["mfcc", "cepstral", "timbre", "feature vector", "fingerprint", "embedding", "similarity", "ml"],
+    category="spectral",
 )
 
 _TAGS_KEY = meta.object_tags(
@@ -338,6 +347,7 @@ _TAGS_KEY = meta.object_tags(
         "May confuse relative major/minor. `NULL` for undecodable input."
     ),
     keywords=["key", "musical key", "tonality", "major", "minor", "chroma", "harmonic", "camelot", "scale"],
+    category="tonal",
 )
 
 

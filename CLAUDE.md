@@ -78,7 +78,11 @@ keeps the worker process alive under hostile input.
 ## librosa specifics
 
 * **Imported once**, lazily + cached (`features._librosa`); `main()` calls
-  `features.warm_up()` so the slow first import is paid before serving.
+  `features.warm_up()`, which not only pays the slow import but also runs the
+  whole feature pipeline once on a tiny synthetic signal — that compiles every
+  librosa/numba kernel up front (tens of seconds, cold) so no served query pays
+  JIT lazily and blows a client's per-statement timeout. Best-effort: it never
+  raises, so a warm-up failure can't stop the worker from serving.
 * **Tempo API moved between releases.** `_tempo_fn` probes, in order,
   `librosa.feature.rhythm.tempo` → `librosa.feature.tempo` → `librosa.beat.tempo`
   (0.11 lacks the `rhythm` submodule). If you bump librosa, re-check this.

@@ -119,6 +119,7 @@ _TAGS_BEATS = meta.object_tags(
         "without a clear pulse."
     ),
     keywords=["beats", "beat tracking", "onsets", "beat grid", "rhythm", "downbeat", "tempo", "timeline"],
+    category="rhythm",
 )
 
 
@@ -263,6 +264,7 @@ _TAGS_INFO = meta.object_tags(
         "alternative to the `duration` / `sample_rate` / `channels` scalars."
     ),
     keywords=["audio info", "metadata", "duration", "sample rate", "channels", "probe", "mediainfo", "summary"],
+    category="metadata",
 )
 
 

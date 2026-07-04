@@ -28,6 +28,7 @@ external tools). Compressed formats (mp3, m4a, ...) require ``ffmpeg`` /
 
 from __future__ import annotations
 
+import contextlib
 import io
 import math
 import warnings
@@ -92,8 +93,59 @@ def _librosa() -> ModuleType:
 
 
 def warm_up() -> None:
-    """Eagerly pay the librosa import cost (called once at worker start)."""
+    """Compile every hot librosa/numba path once, before the worker serves.
+
+    librosa's analysis functions are numba-JIT compiled on *first call*, and that
+    compilation is expensive (tens of seconds, cold) -- far more than any single
+    feature's actual work on real audio. If it happened lazily inside the first
+    query, that query would blow a client's per-statement timeout. So at start-up
+    we run the whole feature pipeline once on a tiny synthetic signal: this pays
+    the JIT cost up front (in process start-up, where it belongs) and leaves every
+    subsequent query fast. Runs at most once and never raises -- a warm-up failure
+    must not stop the worker from serving.
+    """
     _librosa()
+    global _warmed
+    if _warmed:
+        return
+    _warmed = True
+    # Best-effort: a warm-up failure must never stop the worker from serving.
+    with contextlib.suppress(Exception):
+        _run_warm_up()
+
+
+_warmed: bool = False
+
+
+def _warm_up_signal() -> bytes:
+    """A tiny in-memory WAV (a short beeping tone) to drive JIT compilation."""
+    import soundfile as sf  # noqa: PLC0415
+
+    sr = ANALYSIS_SR
+    t = np.arange(int(sr * 0.4), dtype=np.float32) / sr
+    # A 220 Hz tone amplitude-modulated at 4 Hz gives onsets for the beat/tempo
+    # numba kernels to compile against, plus tone for the spectral/chroma paths.
+    tone = 0.3 * np.sin(2.0 * np.pi * 220.0 * t)
+    tone *= 0.5 * (1.0 + np.sin(2.0 * np.pi * 4.0 * t))
+    buf = io.BytesIO()
+    sf.write(buf, tone.astype(np.float32), sr, format="WAV", subtype="PCM_16")
+    return buf.getvalue()
+
+
+def _run_warm_up() -> None:
+    """Exercise every feature once so all numba kernels are already compiled."""
+    audio = AudioInput.from_bytes(_warm_up_signal())
+    duration(audio)
+    sample_rate(audio)
+    channels(audio)
+    rms_energy(audio)
+    zero_crossing_rate(audio)
+    spectral_centroid(audio)
+    spectral_bandwidth(audio)
+    mfcc(audio)
+    estimated_key(audio)
+    tempo(audio)
+    beat_times(audio)
 
 
 # ---------------------------------------------------------------------------

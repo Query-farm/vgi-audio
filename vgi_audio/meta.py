@@ -47,6 +47,7 @@ def object_tags(
     doc_llm: str,
     doc_md: str,
     keywords: Sequence[str],
+    category: str,
 ) -> dict[str, str]:
     """Build the standard per-object discovery/description tags.
 
@@ -56,6 +57,8 @@ def object_tags(
         doc_llm: Markdown narrative for LLM/agent audiences.
         doc_md: Markdown narrative for human documentation.
         keywords: Search terms / synonyms, serialised as a JSON array (VGI138).
+        category: The object's primary ``vgi.category`` -- one of the names in the
+            schema's ``vgi.categories`` registry (VGI409/VGI411).
 
     Returns:
         A tag dict ready to merge into a function/table ``Meta.tags``.
@@ -65,4 +68,5 @@ def object_tags(
         "vgi.doc_llm": doc_llm,
         "vgi.doc_md": doc_md,
         "vgi.keywords": keywords_json(keywords),
+        "vgi.category": category,
     }

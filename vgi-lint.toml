@@ -1,0 +1,15 @@
+# vgi-lint-check config for vgi-audio.
+#
+# Auto-discovered by the linter (and the Query-farm/vgi-lint-check CI action,
+# which runs in the repo root), so local runs and CI share these settings.
+
+[execution]
+# librosa is numba-JIT compiled: audio_worker.py's warm_up() pays the heavy
+# compile cost up front (at start-up, before serving), so every *analysis* query
+# is fast in steady state. The very first query a fresh worker process handles
+# still absorbs a one-time, input-independent init cost (worker RPC/Arrow
+# bring-up) of a few seconds — it lands on whichever example the linter runs
+# first, even a trivial metadata one. The executable examples themselves run in
+# well under 10 ms once warm, so raise the slow-example threshold above that
+# unavoidable cold-start rather than flag an example that is not actually slow.
+slow_seconds = 20.0
