@@ -55,8 +55,13 @@ _TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
 
 
 def _tone_example(fn: str, description: str) -> FunctionExample:
-    """A runnable ``SELECT audio.<fn>(<tone blob>)`` example (returns a row)."""
-    return FunctionExample(sql=f"SELECT audio.{fn}({_TONE_BLOB_SQL})", description=description)
+    """A runnable ``SELECT audio.main.<fn>(<tone blob>)`` example (returns a row).
+
+    The reference is fully catalog-qualified (``catalog.schema.function``) so it
+    both executes when the worker is attached and counts toward per-object example
+    coverage (VGI505/VGI511); a two-part ``audio.<fn>`` reference does neither.
+    """
+    return FunctionExample(sql=f"SELECT audio.main.{fn}({_TONE_BLOB_SQL})", description=description)
 
 
 # ---------------------------------------------------------------------------
@@ -105,11 +110,11 @@ _TAGS_DURATION = meta.object_tags(
         "# duration\n\n"
         "Audio duration in **seconds** (`DOUBLE`).\n\n"
         "```sql\n"
-        "SELECT audio.duration('/music/track.flac');   -- e.g. 213.4\n"
-        "SELECT audio.duration(content) FROM read_blob('clips/*.wav');\n"
+        "SELECT audio.main.duration('/music/track.flac');   -- e.g. 213.4\n"
         "```\n\n"
-        "Reads the native frame count when available, else decodes to measure. "
-        "`NULL` for undecodable or `NULL` input."
+        "Reads the native frame count when available, else decodes to measure; "
+        "works equally over a file path or a column of raw audio bytes. `NULL` for "
+        "undecodable or `NULL` input."
     ),
     keywords=["duration", "length", "seconds", "runtime", "playtime", "audio length", "clip length", "time"],
     category="metadata",
@@ -125,15 +130,20 @@ _TAGS_SAMPLE_RATE = meta.object_tags(
         "downsampled material, or decide resampling before further processing.\n\n"
         "**Behavior.** Read straight from the container header when possible; for "
         "formats that can't be probed, a brief decode recovers the source rate. "
-        "`NULL` on `NULL` or undecodable input."
+        "This is the recording's **native/original** rate -- note the feature "
+        "scalars (tempo, spectral, mfcc, ...) internally resample to 22.05 kHz for "
+        "analysis, so their results are independent of this value. `NULL` on "
+        "`NULL` or undecodable input."
     ),
     doc_md=(
         "# sample_rate\n\n"
         "Native **sample rate in Hz** (`INTEGER`), e.g. `44100`.\n\n"
         "```sql\n"
-        "SELECT audio.sample_rate('/music/track.wav');\n"
+        "SELECT audio.main.sample_rate('/music/track.wav');\n"
         "```\n\n"
-        "Taken from the file header where available. `NULL` for undecodable input."
+        "The recording's original rate, taken from the file header where available "
+        "(the analysis features resample to 22.05 kHz regardless). Also accepts a "
+        "`BLOB`. `NULL` for undecodable input."
     ),
     keywords=["sample rate", "samplerate", "hz", "frequency", "sampling", "44100", "48000", "khz"],
     category="metadata",
@@ -143,22 +153,31 @@ _TAGS_CHANNELS = meta.object_tags(
     title="Audio Channel Count",
     doc_llm=(
         "## audio.channels\n\n"
-        "Return the **number of audio channels** as an `INTEGER` "
-        "(`1` = mono, `2` = stereo, more for surround). Accepts a `VARCHAR` path "
-        "or a `BLOB` of bytes.\n\n"
+        "Return the **number of audio channels** in a recording as an `INTEGER` "
+        "(`1` = mono, `2` = stereo, higher for surround). Accepts either a "
+        "`VARCHAR` filesystem path or a `BLOB` of raw audio bytes.\n\n"
         "**When to use.** Separate mono from stereo material, flag unexpected "
-        "channel layouts, or pick a down-mix strategy.\n\n"
-        "**Behavior.** Read from the container header; for formats that can only "
-        "be decoded (the worker analyses mono), a successful decode reports `1`. "
-        "`NULL` on `NULL` or undecodable input."
+        "channel layouts before mixing, or pick a down-mix strategy.\n\n"
+        "**Behavior.** The count is read from the container header, which is exact "
+        "for WAV/FLAC/OGG. Only when the header cannot be read does the worker fall "
+        "back to a decode, and because that analysis path is mono it then reports "
+        "`1` -- so a `1` from a header-less source means 'decodable as mono', not a "
+        "guaranteed true channel count. Returns `NULL` for `NULL` input and for "
+        "anything undecodable; it never raises."
     ),
     doc_md=(
         "# channels\n\n"
-        "Number of **audio channels** (`INTEGER`): `1` mono, `2` stereo, ...\n\n"
+        "Number of **audio channels** (`INTEGER`): `1` = mono, `2` = stereo, more "
+        "for surround.\n\n"
         "```sql\n"
-        "SELECT audio.channels('/music/track.wav');\n"
+        "-- Path input:\n"
+        "SELECT audio.main.channels('/music/track.wav');\n"
+        "-- Bytes input (a BLOB column or literal):\n"
+        "SELECT audio.main.channels(audio_bytes);\n"
         "```\n\n"
-        "From the file header where available. `NULL` for undecodable input."
+        "Read from the file header (exact for WAV/FLAC/OGG). If only a decode is "
+        "possible the worker's mono analysis path reports `1`. `NULL` for `NULL` or "
+        "undecodable input."
     ),
     keywords=["channels", "mono", "stereo", "surround", "channel count", "layout", "multichannel"],
     category="metadata",
@@ -182,7 +201,7 @@ _TAGS_TEMPO = meta.object_tags(
         "# tempo\n\n"
         "Estimated **tempo in BPM** (`DOUBLE`).\n\n"
         "```sql\n"
-        "SELECT audio.tempo('/music/track.mp3');   -- e.g. 120.0\n"
+        "SELECT audio.main.tempo('/music/track.mp3');   -- e.g. 120.0\n"
         "```\n\n"
         "> Heuristic: may report a half/double-time multiple, and is unreliable "
         "on audio without a steady beat. `NULL` for undecodable input."
@@ -200,18 +219,22 @@ _TAGS_RMS = meta.object_tags(
         "of bytes.\n\n"
         "**When to use.** Rank recordings by overall loudness, detect near-silent "
         "or clipped/hot clips, or normalise levels across a collection.\n\n"
-        "**Behavior.** Averaged over short analysis frames of a bounded mono "
-        "signal; values are unitless amplitude (roughly `0`..`1` for normalised "
-        "audio). `NULL` on `NULL` or undecodable input."
+        "**Behavior.** The RMS amplitude is computed per short analysis frame over "
+        "a bounded mono signal and then averaged. Values are a unitless linear "
+        "amplitude (not decibels), roughly `0`..`1` for normalised audio -- take "
+        "`20*log10(x)` for a dBFS-like figure. It reflects signal level, not "
+        "perceived loudness (no A/K-weighting). `NULL` on `NULL` or undecodable "
+        "input."
     ),
     doc_md=(
         "# rms_energy\n\n"
         "Mean **RMS energy** (`DOUBLE`) -- a loudness proxy.\n\n"
         "```sql\n"
-        "SELECT audio.rms_energy('/music/track.wav');\n"
+        "SELECT audio.main.rms_energy('/music/track.wav');\n"
         "```\n\n"
-        "Higher means louder; near `0` means near-silent. `NULL` for undecodable "
-        "input."
+        "Higher means louder; near `0` means near-silent. Linear amplitude "
+        "(~`0`..`1`), not dB -- use `20*log10(x)` for dBFS. Also accepts a `BLOB`. "
+        "`NULL` for undecodable input."
     ),
     keywords=["rms", "energy", "loudness", "level", "amplitude", "volume", "power", "silence"],
     category="loudness",
@@ -221,23 +244,26 @@ _TAGS_ZCR = meta.object_tags(
     title="Mean Zero-Crossing Rate",
     doc_llm=(
         "## audio.zero_crossing_rate\n\n"
-        "Return the **mean zero-crossing rate** of the signal as a `DOUBLE` -- "
-        "the average fraction of samples where the waveform changes sign. Accepts "
-        "a `VARCHAR` path or a `BLOB` of bytes.\n\n"
+        "Return the **mean zero-crossing rate** of the signal as a `DOUBLE` -- the "
+        "average fraction of adjacent samples where the waveform changes sign. "
+        "Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n"
         "**When to use.** A cheap timbre/noisiness cue: percussive, noisy, or "
         "unvoiced content has a high ZCR; smooth tonal content a low one. Useful "
         "for rough speech-vs-music or voiced-vs-unvoiced splits.\n\n"
-        "**Behavior.** Averaged over analysis frames of a bounded mono signal; "
-        "value is a fraction in `0`..`1`. `NULL` on `NULL` or undecodable input."
+        "**Behavior.** Computed per analysis frame over a bounded mono signal and "
+        "averaged; the value is a fraction in `0`..`1` (the share of sample pairs "
+        "that cross zero). It tracks high-frequency/noise content but is not a "
+        "pitch or frequency estimate. `NULL` on `NULL` or undecodable input."
     ),
     doc_md=(
         "# zero_crossing_rate\n\n"
         "Mean **zero-crossing rate** (`DOUBLE`, `0`..`1`).\n\n"
         "```sql\n"
-        "SELECT audio.zero_crossing_rate('/music/track.wav');\n"
+        "SELECT audio.main.zero_crossing_rate('/music/track.wav');\n"
         "```\n\n"
-        "High for noisy/percussive audio, low for smooth tones. `NULL` for "
-        "undecodable input."
+        "High for noisy/percussive audio, low for smooth tones; a fraction of sign "
+        "changes, not a frequency. Also accepts a `BLOB`. `NULL` for undecodable "
+        "input."
     ),
     keywords=["zero crossing rate", "zcr", "noisiness", "timbre", "sign changes", "percussive", "voiced"],
     category="spectral",
@@ -248,20 +274,26 @@ _TAGS_CENTROID = meta.object_tags(
     doc_llm=(
         "## audio.spectral_centroid\n\n"
         "Return the **mean spectral centroid in Hz** as a `DOUBLE` -- the "
-        "center of mass of the spectrum, a standard brightness measure. Accepts "
-        "a `VARCHAR` path or a `BLOB` of bytes.\n\n"
-        "**When to use.** Quantify timbral brightness to rank or cluster sounds "
-        "(bright/sharp vs dark/dull), or as a feature for similarity search.\n\n"
-        "**Behavior.** Averaged over analysis frames of a bounded mono signal; "
-        "higher Hz means a brighter sound. `NULL` on `NULL` or undecodable input."
+        "amplitude-weighted center of mass of the magnitude spectrum, the standard "
+        "measure of timbral brightness. Accepts a `VARCHAR` path or a `BLOB` of "
+        "bytes.\n\n"
+        "**When to use.** Quantify brightness to rank or cluster sounds (bright/"
+        "sharp vs dark/dull), gate on tone colour, or feed a similarity model.\n\n"
+        "**Behavior.** Computed per analysis frame and averaged over a bounded mono "
+        "signal resampled to 22.05 kHz, so the value ranges from `0` up to the "
+        "Nyquist limit of ~11 kHz; brighter sounds sit higher. It is energy-"
+        "weighted, so near-silent frames contribute little. `NULL` on `NULL` or "
+        "undecodable input."
     ),
     doc_md=(
         "# spectral_centroid\n\n"
         "Mean **spectral centroid in Hz** (`DOUBLE`) -- spectral brightness.\n\n"
         "```sql\n"
-        "SELECT audio.spectral_centroid('/music/track.wav');\n"
+        "SELECT audio.main.spectral_centroid('/music/track.wav');\n"
         "```\n\n"
-        "Higher = brighter/sharper timbre. `NULL` for undecodable input."
+        "Higher = brighter/sharper timbre. Analysis runs at 22.05 kHz, so values "
+        "top out near the ~11 kHz Nyquist limit. Also accepts a `BLOB` of raw "
+        "bytes. `NULL` for undecodable input."
     ),
     keywords=["spectral centroid", "brightness", "timbre", "center of mass", "spectrum", "sharpness"],
     category="spectral",
@@ -271,23 +303,25 @@ _TAGS_BANDWIDTH = meta.object_tags(
     title="Mean Spectral Bandwidth (Hz)",
     doc_llm=(
         "## audio.spectral_bandwidth\n\n"
-        "Return the **mean spectral bandwidth in Hz** as a `DOUBLE` -- the "
-        "spread of the spectrum around its centroid. Accepts a `VARCHAR` path or "
-        "a `BLOB` of bytes.\n\n"
-        "**When to use.** Distinguish narrow-band tonal sounds (small bandwidth) "
-        "from broadband or noisy sounds (large bandwidth); a complementary timbre "
-        "feature alongside the centroid.\n\n"
-        "**Behavior.** Averaged over analysis frames of a bounded mono signal. "
-        "`NULL` on `NULL` or undecodable input."
+        "Return the **mean spectral bandwidth in Hz** as a `DOUBLE` -- the energy-"
+        "weighted spread (a p=2 standard deviation) of the spectrum around its "
+        "centroid. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n"
+        "**When to use.** Separate narrow-band tonal sounds (small bandwidth) from "
+        "broadband or noisy sounds (large bandwidth); a complementary timbre "
+        "feature alongside `spectral_centroid`.\n\n"
+        "**Behavior.** Computed per analysis frame and averaged over a bounded mono "
+        "signal resampled to 22.05 kHz, so it is bounded by the ~11 kHz Nyquist "
+        "limit. `NULL` on `NULL` or undecodable input."
     ),
     doc_md=(
         "# spectral_bandwidth\n\n"
         "Mean **spectral bandwidth in Hz** (`DOUBLE`) -- spectral spread.\n\n"
         "```sql\n"
-        "SELECT audio.spectral_bandwidth('/music/track.wav');\n"
+        "SELECT audio.main.spectral_bandwidth('/music/track.wav');\n"
         "```\n\n"
-        "Small = tonal/narrow-band; large = broadband/noisy. `NULL` for "
-        "undecodable input."
+        "Small = tonal/narrow-band; large = broadband/noisy. Bounded by the "
+        "~11 kHz Nyquist limit of the 22.05 kHz analysis. Also accepts a `BLOB`. "
+        "`NULL` for undecodable input."
     ),
     keywords=["spectral bandwidth", "spread", "spectrum width", "timbre", "broadband", "narrowband"],
     category="spectral",
@@ -297,26 +331,38 @@ _TAGS_MFCC = meta.object_tags(
     title="MFCC Coefficient Means",
     doc_llm=(
         "## audio.mfcc\n\n"
-        "Return the **mean of each Mel-frequency cepstral coefficient (MFCC)** as "
-        "a `DOUBLE[]` -- the de-facto compact timbral fingerprint of a sound. "
-        "Accepts a `VARCHAR` path or a `BLOB` of bytes, plus an optional "
-        "coefficient count `n` (default `13`, clamped to `[1, 128]`).\n\n"
-        "**When to use.** A ready-made feature vector for audio similarity "
-        "search, clustering, classification, or ML pipelines -- store the list "
-        "per recording and compare with a distance metric.\n\n"
-        "**Behavior.** Each coefficient is averaged over analysis frames of a "
-        "bounded mono signal, yielding a length-`n` list. `NULL` on `NULL` or "
-        "undecodable input."
+        "Return the **mean of each Mel-frequency cepstral coefficient (MFCC)** over "
+        "the whole clip as a `DOUBLE[]` -- a compact timbral fingerprint.\n\n"
+        "**Signature.** `mfcc(audio)` or `mfcc(audio, n)`. `audio` is a `VARCHAR` "
+        "path or a `BLOB` of raw bytes; the optional `n` sets how many coefficients "
+        "to keep (default `13`, clamped to `[1, 128]`), and the result is a "
+        "length-`n` list of per-coefficient means.\n\n"
+        "**When to use.** A ready-made feature vector for audio similarity search, "
+        "clustering, or classification -- store the list per recording and compare "
+        "with a distance metric.\n\n"
+        "**Caveats for ML.** The first coefficient (`MFCC-0`) tracks overall "
+        "log-energy/loudness rather than timbre and can dominate a raw Euclidean "
+        "distance -- drop it or weight it down for timbral similarity. The means are "
+        "unnormalized and the coefficients live on different scales, so standardize "
+        "(z-score) them across your corpus before computing distances. Averaging "
+        "over the whole clip also discards how timbre evolves over time. Returns "
+        "`NULL` on `NULL` or undecodable input."
     ),
     doc_md=(
         "# mfcc\n\n"
-        "Per-coefficient **MFCC means** as a `DOUBLE[]` (timbral fingerprint).\n\n"
+        "Per-coefficient **MFCC means** over the clip as a `DOUBLE[]` (a timbral "
+        "fingerprint).\n\n"
         "```sql\n"
-        "SELECT audio.mfcc('/music/track.wav');       -- 13 means\n"
-        "SELECT audio.mfcc('/music/track.wav', 20);   -- 20 means\n"
+        "SELECT audio.main.mfcc('/music/track.wav');       -- 13 coefficient means\n"
+        "SELECT audio.main.mfcc('/music/track.wav', 20);   -- keep 20 instead\n"
         "```\n\n"
-        "Optional `n` sets the coefficient count (default 13). `NULL` for "
-        "undecodable input. Great as a similarity/ML feature vector."
+        "Call it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default "
+        "13, clamped to 1..128) sets the vector length, and `audio` is a path or a "
+        "BLOB.\n\n"
+        "**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects "
+        "overall loudness, not timbre -- drop or down-weight it for similarity. The "
+        "means are unnormalized and per-coefficient scales differ, so z-score them "
+        "across your data before Euclidean distance. `NULL` for undecodable input."
     ),
     keywords=["mfcc", "cepstral", "timbre", "feature vector", "fingerprint", "embedding", "similarity", "ml"],
     category="spectral",
@@ -341,7 +387,7 @@ _TAGS_KEY = meta.object_tags(
         "# estimated_key\n\n"
         "Heuristic **musical key** (`VARCHAR`), e.g. `'C major'`.\n\n"
         "```sql\n"
-        "SELECT audio.estimated_key('/music/track.wav');\n"
+        "SELECT audio.main.estimated_key('/music/track.wav');\n"
         "```\n\n"
         "> Krumhansl-Schmuckler chroma heuristic -- a hint, not ground truth. "
         "May confuse relative major/minor. `NULL` for undecodable input."
@@ -719,7 +765,7 @@ class MfccPathNFunction(ScalarFunction):
         tags = _TAGS_MFCC
         examples = [
             FunctionExample(
-                sql=f"SELECT audio.mfcc({_TONE_BLOB_SQL}, 20)",
+                sql=f"SELECT audio.main.mfcc({_TONE_BLOB_SQL}, 20)",
                 description="20 MFCC means of an inline WAV tone",
             ),
         ]
@@ -766,7 +812,7 @@ class MfccBytesNFunction(ScalarFunction):
         tags = _TAGS_MFCC
         examples = [
             FunctionExample(
-                sql=f"SELECT audio.mfcc({_TONE_BLOB_SQL}, 20)",
+                sql=f"SELECT audio.main.mfcc({_TONE_BLOB_SQL}, 20)",
                 description="20 MFCC means of an inline WAV tone (BLOB)",
             ),
         ]

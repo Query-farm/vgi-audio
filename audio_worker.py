@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.8.5",
+#     "vgi-python[http]>=0.10.0",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
@@ -44,7 +44,7 @@ from vgi.catalog import Catalog, Schema
 from vgi_audio import features
 from vgi_audio._example_audio import CLICK_WAV_B64, TONE_WAV_B64
 from vgi_audio.scalars import SCALAR_FUNCTIONS
-from vgi_audio.tables import TABLE_FUNCTIONS
+from vgi_audio.tables import DISCOVERY_TABLES, TABLE_FUNCTIONS
 
 # Inline self-contained blobs (see vgi_audio._example_audio) so the schema's
 # representative example queries EXECUTE against the live worker -- a bare path
@@ -168,73 +168,151 @@ _CATEGORIES_JSON = json.dumps(
     ]
 )
 
-# VGI152/VGI407: the agent-suitability suite that `vgi-lint simulate` grades. Each
-# task is a {name, prompt, reference_sql} object; the prompt is the ONLY field
-# shown to the analyst, and reference_sql is a grader-only canonical solution.
+# VGI152/VGI407/VGI520: the agent-suitability suite that `vgi-lint simulate`
+# grades (VGI920). Each task is a {name, prompt, reference_sql, ...} object; the
+# prompt is the ONLY field shown to the analyst — reference_sql is a grader-only
+# canonical solution.
 #
-# Every task is solvable from the catalog alone: the analyst discovers the
-# relevant table function, reads the inline example audio (a base64 blob) that the
-# function documents, and runs it — so each reference matches a documented,
-# executable example and the suite is sound and deterministic. The tasks target
-# the two set-returning entry points (``beats`` and ``audio_info``) because they
-# return structured rows an agent consumes directly — the realistic "ask the
-# worker a question" surface. The per-file scalars they build on (``duration`` /
-# ``sample_rate`` / ``channels`` and the signal/spectral/rhythm features) are
-# fully documented for discovery, but a scalar answer that must re-embed a whole
-# audio blob inline is an awkward agent task, so the graded suite exercises the
-# table functions.
+# Discovery design. Every task points the analyst at the browsable ``example_clips``
+# discovery table (two built-in clips as real rows, with the raw ``audio`` BLOB and
+# the precomputed core facts). The analyst lists the table, reads the relevant
+# column or applies a scalar to the ``audio`` column, and answers — no need to copy
+# a multi-kilobyte inline blob out of a truncated tool output. The suite covers
+# every worker object: the discovery table, both set-returning functions
+# (``audio_info``, ``beats``), and all ten feature scalars.
+#
+# Robust grading. Grading (Tier-1) compares the analyst's result to reference_sql
+# run live against the same worker. Raw feature *values* are heuristic floats an
+# analyst may reasonably round or realias, which makes an exact float compare a
+# coin-flip; so every feature task instead asks a **yes/no question against a fixed
+# threshold** and the reference returns a plain BOOLEAN — a discrete answer that is
+# stable across analyst phrasing (thresholds are a mix of true and false so the
+# question genuinely has to be computed, not guessed). The reference still *calls*
+# the function it targets, so VGI520 object coverage holds. The two set-returning
+# functions take only a LITERAL blob argument (a VGI table function cannot bind a
+# column or subquery), so their references embed the inline example blob directly;
+# both are additionally answerable from the discovery table's precomputed
+# ``duration``/``sample_rate``/``channels``/``beat_count`` columns — the path the
+# analyst actually takes.
+
+
+def _predicate_task(name: str, prompt: str, predicate: str, clip: str) -> dict[str, object]:
+    """A yes/no task: does ``predicate`` (a scalar applied to a clip) hold?
+
+    Args:
+        name: Unique task id.
+        prompt: The natural-language yes/no question shown to the analyst.
+        predicate: A boolean SQL expression over the clip's ``audio`` column that
+            calls the feature scalar under test (e.g. ``audio.main.tempo(audio) > 100``).
+        clip: The example-clip name whose row the predicate is evaluated on.
+
+    Returns:
+        A ``vgi.agent_test_tasks`` task object (grader-only boolean ``reference_sql``).
+    """
+    return {
+        "name": name,
+        "prompt": prompt,
+        "reference_sql": f"SELECT {predicate} AS answer FROM audio.main.example_clips WHERE name = '{clip}'",
+        "ignore_column_names": True,
+    }
+
+
 _AGENT_TEST_TASKS_JSON = json.dumps(
     [
         {
+            "name": "list-example-clips",
+            "prompt": (
+                "The audio catalog ships a small set of built-in example audio clips you can "
+                "experiment with. List them with their name and duration in seconds, ordered by name."
+            ),
+            "reference_sql": "SELECT name, duration FROM audio.main.example_clips ORDER BY name",
+            "ignore_column_names": True,
+        },
+        {
             "name": "tone-metadata-row",
             "prompt": (
-                "The audio catalog documents an inline example WAV tone (a base64 audio blob "
-                "shown on its combined-metadata table function). Return that tone's duration, "
-                "sample rate, and channel count as a single row."
+                "Using the catalog's built-in example clips, return the combined audio metadata "
+                "— duration, sample rate, and channel count — of the clip named 'tone' as a single row."
             ),
             "reference_sql": (f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})"),
+            "ignore_column_names": True,
         },
         {
-            "name": "click-metadata-row",
+            "name": "click-has-beats",
             "prompt": (
-                "The audio catalog documents an inline example click-track clip. Return its "
-                "combined audio metadata — duration, sample rate, and channel count — as one row."
+                "The catalog's built-in example clips include one named 'click'. Does that clip "
+                "have any detected beats? Return a single true/false value."
             ),
-            "reference_sql": (f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_CLICK_BLOB_SQL})"),
+            "reference_sql": (f"SELECT count(*) > 0 AS answer FROM audio.main.beats({_CLICK_BLOB_SQL})"),
+            "ignore_column_names": True,
         },
-        {
-            "name": "tone-duration",
-            "prompt": (
-                "From the example tone's combined audio-metadata row, report only its duration "
-                "in seconds. Use the audio catalog's documented example tone clip."
-            ),
-            "reference_sql": f"SELECT duration FROM audio.main.audio_info({_TONE_BLOB_SQL})",
-        },
-        {
-            "name": "tone-sample-rate",
-            "prompt": (
-                "From the example tone's combined audio-metadata row, report only its native "
-                "sample rate in Hz. Use the audio catalog's documented example tone clip."
-            ),
-            "reference_sql": f"SELECT sample_rate FROM audio.main.audio_info({_TONE_BLOB_SQL})",
-        },
-        {
-            "name": "tone-channels",
-            "prompt": (
-                "How many audio channels does the example tone have, per its combined "
-                "audio-metadata row? Use the audio catalog's documented example tone clip."
-            ),
-            "reference_sql": f"SELECT channels FROM audio.main.audio_info({_TONE_BLOB_SQL})",
-        },
-        {
-            "name": "click-beat-times",
-            "prompt": (
-                "The audio catalog documents an inline example click-track clip on its "
-                "beat-tracking table function. Return that clip's detected beat onset times as "
-                "(seq, time) rows, ordered by seq."
-            ),
-            "reference_sql": f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
-        },
+        _predicate_task(
+            "tone-duration-short",
+            "Is the built-in example clip named 'tone' shorter than 1 second? Return true or false.",
+            "audio.main.duration(audio) < 1.0",
+            "tone",
+        ),
+        _predicate_task(
+            "click-sample-rate-high",
+            "Is the native sample rate of the built-in example clip named 'click' at least 5000 Hz? "
+            "Return true or false.",
+            "audio.main.sample_rate(audio) >= 5000",
+            "click",
+        ),
+        _predicate_task(
+            "tone-is-mono",
+            "Is the built-in example clip named 'tone' mono (exactly one audio channel)? Return true or false.",
+            "audio.main.channels(audio) = 1",
+            "tone",
+        ),
+        _predicate_task(
+            "click-tempo-fast",
+            "Is the estimated tempo of the built-in example clip named 'click' greater than 100 BPM? "
+            "Return true or false.",
+            "audio.main.tempo(audio) > 100",
+            "click",
+        ),
+        _predicate_task(
+            "click-rms-loud",
+            "Is the mean RMS energy of the built-in example clip named 'click' greater than 0.1? Return true or false.",
+            "audio.main.rms_energy(audio) > 0.1",
+            "click",
+        ),
+        _predicate_task(
+            "tone-zcr-low",
+            "Is the mean zero-crossing rate of the built-in example clip named 'tone' below 0.05? "
+            "Return true or false.",
+            "audio.main.zero_crossing_rate(audio) < 0.05",
+            "tone",
+        ),
+        _predicate_task(
+            "click-centroid-bright",
+            "Is the mean spectral centroid of the built-in example clip named 'click' above 500 Hz? "
+            "Return true or false.",
+            "audio.main.spectral_centroid(audio) > 500",
+            "click",
+        ),
+        _predicate_task(
+            "tone-bandwidth-wide",
+            "Is the mean spectral bandwidth of the built-in example clip named 'tone' greater than 200 Hz? "
+            "Return true or false.",
+            "audio.main.spectral_bandwidth(audio) > 200",
+            "tone",
+        ),
+        _predicate_task(
+            "click-mfcc-13",
+            "Using the default settings, does the MFCC feature vector of the built-in example clip named "
+            "'click' contain exactly 13 coefficients? Return true or false.",
+            "len(audio.main.mfcc(audio)) = 13",
+            "click",
+        ),
+        _predicate_task(
+            "click-key-minor",
+            "Is the estimated musical key of the built-in example clip named 'click' a minor key? "
+            "Return true or false.",
+            "audio.main.estimated_key(audio) LIKE '%minor%'",
+            "click",
+        ),
     ]
 )
 
@@ -324,6 +402,10 @@ _AUDIO_CATALOG = Catalog(
                 # VGI506 representative, runnable example queries for the schema.
                 "vgi.example_queries": _SCHEMA_EXAMPLE_QUERIES,
             },
+            # VGI146: a browsable discovery table (example_clips) so an agent can
+            # see real data and grab a ready-made audio blob before it has to
+            # supply audio bytes to the feature functions.
+            tables=list(DISCOVERY_TABLES),
             functions=list(_FUNCTIONS),
         ),
     ],

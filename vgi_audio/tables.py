@@ -16,11 +16,14 @@ logic returns ``None``; the worker never crashes).
 
 from __future__ import annotations
 
+import base64
+import json
 from dataclasses import dataclass
 from typing import Annotated, Any, ClassVar
 
 import pyarrow as pa
 from vgi.arguments import Arg
+from vgi.catalog import Table
 from vgi.metadata import FunctionExample
 from vgi.table_function import (
     BindParams,
@@ -93,6 +96,18 @@ _BEATS_COLUMNS_MD = (
     "| `time` | DOUBLE | Beat onset time in seconds. |"
 )
 
+# VGI307/VGI414: a table function with no backing table must declare its static
+# result schema through the structured `vgi.result_columns_schema` (the retired
+# free-form `vgi.result_columns_md` is no longer read). VGI910 checks this matches
+# what the function actually returns, so the types mirror `_BEATS_SCHEMA` exactly
+# (int64 -> BIGINT, float64 -> DOUBLE).
+_BEATS_COLUMNS_SCHEMA = json.dumps(
+    [
+        {"name": "seq", "type": "BIGINT", "description": "0-based beat index (ascending)."},
+        {"name": "time", "type": "DOUBLE", "description": "Beat onset time in seconds."},
+    ]
+)
+
 _TAGS_BEATS = meta.object_tags(
     title="Beat Onset Times Table",
     doc_llm=(
@@ -112,11 +127,9 @@ _TAGS_BEATS = meta.object_tags(
         "# beats\n\n"
         "Table function -> detected **beat onset times**, one row per beat.\n\n"
         f"{_BEATS_COLUMNS_MD}\n\n"
-        "```sql\n"
-        "SELECT seq, time FROM audio.beats('/music/track.wav') ORDER BY seq;\n"
-        "```\n\n"
-        "Heuristic beat tracking; **no rows** for undecodable input or audio "
-        "without a clear pulse."
+        "Heuristic beat tracking on a bounded mono signal; returns **no rows** for "
+        "undecodable input or audio without a clear pulse. See the example queries "
+        "for ready-to-run SQL."
     ),
     keywords=["beats", "beat tracking", "onsets", "beat grid", "rhythm", "downbeat", "tempo", "timeline"],
     category="rhythm",
@@ -151,12 +164,12 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
         categories = ["audio", "rhythm"]
         tags = {
             **_TAGS_BEATS,
-            "vgi.result_columns_md": _BEATS_COLUMNS_MD,
+            "vgi.result_columns_schema": _BEATS_COLUMNS_SCHEMA,
             "vgi.executable_examples": _EXECUTABLE_EXAMPLES,
         }
         examples = [
             FunctionExample(
-                sql=f"SELECT seq, time FROM audio.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+                sql=f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
                 description="Beat onset times of an inline click track",
             ),
         ]
@@ -185,10 +198,10 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
         name = "beats"
         description = "Beat onset times (seq, time) of a BLOB of audio bytes"
         categories = ["audio", "rhythm"]
-        tags = {**_TAGS_BEATS, "vgi.result_columns_md": _BEATS_COLUMNS_MD}
+        tags = {**_TAGS_BEATS, "vgi.result_columns_schema": _BEATS_COLUMNS_SCHEMA}
         examples = [
             FunctionExample(
-                sql=f"SELECT seq, time FROM audio.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+                sql=f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
                 description="Beat onset times from an inline click track (BLOB)",
             ),
         ]
@@ -239,6 +252,16 @@ _INFO_COLUMNS_MD = (
     "| `channels` | INTEGER | Number of audio channels (1=mono, 2=stereo). |"
 )
 
+# VGI307/VGI414: structured static result schema (types mirror `_INFO_SCHEMA`:
+# float64 -> DOUBLE, int32 -> INTEGER). Checked against the live return by VGI910.
+_INFO_COLUMNS_SCHEMA = json.dumps(
+    [
+        {"name": "duration", "type": "DOUBLE", "description": "Duration in seconds."},
+        {"name": "sample_rate", "type": "INTEGER", "description": "Native sample rate in Hz."},
+        {"name": "channels", "type": "INTEGER", "description": "Number of audio channels (1=mono, 2=stereo)."},
+    ]
+)
+
 _TAGS_INFO = meta.object_tags(
     title="Combined Audio Metadata Row",
     doc_llm=(
@@ -257,11 +280,9 @@ _TAGS_INFO = meta.object_tags(
         "# audio_info\n\n"
         "Table function -> one row of core **audio metadata**.\n\n"
         f"{_INFO_COLUMNS_MD}\n\n"
-        "```sql\n"
-        "SELECT * FROM audio.audio_info('/music/track.wav');\n"
-        "```\n\n"
         "One row on success; **no rows** for undecodable input. A one-shot "
-        "alternative to the `duration` / `sample_rate` / `channels` scalars."
+        "alternative to the `duration` / `sample_rate` / `channels` scalars. See "
+        "the example queries for ready-to-run SQL."
     ),
     keywords=["audio info", "metadata", "duration", "sample rate", "channels", "probe", "mediainfo", "summary"],
     category="metadata",
@@ -302,10 +323,10 @@ class AudioInfoPathFunction(TableFunctionGenerator[_InfoPathArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of an audio file path"
         categories = ["audio", "metadata"]
-        tags = {**_TAGS_INFO, "vgi.result_columns_md": _INFO_COLUMNS_MD}
+        tags = {**_TAGS_INFO, "vgi.result_columns_schema": _INFO_COLUMNS_SCHEMA}
         examples = [
             FunctionExample(
-                sql=f"SELECT duration, sample_rate, channels FROM audio.audio_info({_TONE_BLOB_SQL})",
+                sql=f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})",
                 description="Metadata of an inline WAV tone",
             ),
         ]
@@ -334,10 +355,10 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
         name = "audio_info"
         description = "Single-row (duration, sample_rate, channels) of a BLOB of audio bytes"
         categories = ["audio", "metadata"]
-        tags = {**_TAGS_INFO, "vgi.result_columns_md": _INFO_COLUMNS_MD}
+        tags = {**_TAGS_INFO, "vgi.result_columns_schema": _INFO_COLUMNS_SCHEMA}
         examples = [
             FunctionExample(
-                sql=f"SELECT duration, sample_rate, channels FROM audio.audio_info({_TONE_BLOB_SQL})",
+                sql=f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})",
                 description="Metadata from an inline WAV tone (BLOB)",
             ),
         ]
@@ -353,9 +374,183 @@ class AudioInfoBytesFunction(TableFunctionGenerator[_InfoBytesArgs]):
         _emit_info(AudioInput.from_bytes(params.args.blob), params, out)
 
 
+# ===========================================================================
+# example_clips  --  a browsable discovery table (VGI146)
+#
+# The rest of the worker is table *functions* that take an audio argument, so an
+# agent has nothing to browse before it knows how to supply audio bytes. This
+# zero-argument table surfaces the worker's two built-in example clips as real,
+# selectable rows -- name, a one-line description, the decoded core metadata, and
+# the raw `audio` BLOB itself -- so an analyst can read sample data and copy a
+# clip straight into any feature function without a file on disk.
+# ===========================================================================
+
+
+@dataclass(kw_only=True)
+class _NoArgs:
+    """A discovery table function that takes no arguments."""
+
+
+# (name, description, base64 WAV) for each built-in example clip.
+_EXAMPLE_CLIPS: tuple[tuple[str, str, str], ...] = (
+    ("tone", "A short 60 Hz mono sine tone (a steady, tonal test signal).", TONE_WAV_B64),
+    ("click", "A 120 BPM mono click track (sharp, evenly-spaced onsets).", CLICK_WAV_B64),
+)
+
+_CLIPS_SCHEMA = pa.schema(
+    [
+        field("name", pa.string(), "Short identifier of the example clip.", nullable=False),
+        field("description", pa.string(), "What the clip is.", nullable=False),
+        field("duration", pa.float64(), "Duration in seconds.", nullable=False),
+        field("sample_rate", pa.int32(), "Native sample rate in Hz.", nullable=False),
+        field("channels", pa.int32(), "Number of audio channels.", nullable=False),
+        field("beat_count", pa.int32(), "Number of beats librosa detects in the clip.", nullable=False),
+        field("audio", pa.binary(), "Raw WAV audio bytes -- pass straight to any feature function.", nullable=False),
+    ]
+)
+
+
+@init_single_worker
+@bind_fixed_schema
+class ExampleClipsFunction(TableFunctionGenerator[_NoArgs]):
+    """The worker's built-in example audio clips, one row per clip."""
+
+    FIXED_SCHEMA: ClassVar[pa.Schema] = _CLIPS_SCHEMA
+
+    class Meta:
+        """Function metadata."""
+
+        name = "example_clips"
+        description = "Built-in example audio clips (name, metadata, raw bytes) for trying the feature functions"
+        categories = ["audio", "metadata"]
+
+    @classmethod
+    def cardinality(cls, params: BindParams[_NoArgs]) -> TableCardinality:
+        """Estimated and maximum row count for the planner."""
+        return TableCardinality(estimate=len(_EXAMPLE_CLIPS), max=len(_EXAMPLE_CLIPS))
+
+    @classmethod
+    def process(cls, params: ProcessParams[_NoArgs], state: None, out: OutputCollector) -> None:
+        """Emit one row per built-in example clip."""
+        names: list[str] = []
+        descriptions: list[str] = []
+        durations: list[float | None] = []
+        sample_rates: list[int | None] = []
+        channels: list[int | None] = []
+        beat_counts: list[int] = []
+        audio: list[bytes] = []
+        for clip_name, clip_desc, b64 in _EXAMPLE_CLIPS:
+            raw = base64.b64decode(b64)
+            clip = AudioInput.from_bytes(raw)
+            info = features.audio_info(clip)
+            dur, sr, ch = info if info is not None else (None, None, None)
+            beats = features.beat_times(clip)
+            names.append(clip_name)
+            descriptions.append(clip_desc)
+            durations.append(dur)
+            sample_rates.append(sr)
+            channels.append(ch)
+            beat_counts.append(len(beats) if beats is not None else 0)
+            audio.append(raw)
+        out.emit(
+            pa.RecordBatch.from_pydict(
+                {
+                    "name": names,
+                    "description": descriptions,
+                    "duration": durations,
+                    "sample_rate": sample_rates,
+                    "channels": channels,
+                    "beat_count": beat_counts,
+                    "audio": audio,
+                },
+                schema=params.output_schema,
+            )
+        )
+        out.finish()
+
+
+_CLIPS_DOC_LLM = (
+    "## audio.example_clips\n\n"
+    "A **browsable table** (no arguments) listing the worker's built-in example "
+    "audio clips, one row each: `name`, a one-line `description`, the decoded "
+    "`duration`/`sample_rate`/`channels`, the detected `beat_count`, and the raw "
+    "`audio` `BLOB`.\n\n"
+    "**When to use.** Start here to see real sample data and to grab a ready-made "
+    "audio blob: select the `audio` column for a clip and pass it directly to any "
+    "feature function (`duration`, `tempo`, `mfcc`, `beats`, `audio_info`, ...) "
+    "without needing a file on disk. The `tone` clip is a steady sine (good for "
+    "the metadata/spectral scalars); the `click` clip has a clear 120 BPM pulse "
+    "(good for `tempo` and `beats`)."
+)
+
+_CLIPS_DOC_MD = (
+    "# example_clips\n\n"
+    "A browsable discovery table of the worker's built-in example audio clips.\n\n"
+    "| column | type | description |\n"
+    "|---|---|---|\n"
+    "| `name` | VARCHAR | Short clip identifier (`tone`, `click`). |\n"
+    "| `description` | VARCHAR | What the clip is. |\n"
+    "| `duration` | DOUBLE | Duration in seconds. |\n"
+    "| `sample_rate` | INTEGER | Native sample rate in Hz. |\n"
+    "| `channels` | INTEGER | Number of audio channels. |\n"
+    "| `beat_count` | INTEGER | Number of beats librosa detects in the clip. |\n"
+    "| `audio` | BLOB | Raw WAV bytes to feed any feature function. |\n\n"
+    "Select the `audio` column of a row and pass it straight into a scalar or "
+    "table function to try the worker with no file on disk. See the example "
+    "queries for ready-to-run SQL."
+)
+
+CLIPS_TABLE = Table(
+    name="example_clips",
+    function=ExampleClipsFunction,
+    comment="Built-in example audio clips (name, core metadata, raw bytes) for trying the feature functions.",
+    primary_key=(("name",),),
+    not_null=("name", "description", "duration", "sample_rate", "channels", "beat_count", "audio"),
+    column_comments={
+        "name": "Short identifier of the example clip (`tone` or `click`).",
+        "description": "One-line description of the clip.",
+        "duration": "Clip duration in seconds.",
+        "sample_rate": "Native sample rate in Hz.",
+        "channels": "Number of audio channels (1 = mono).",
+        "beat_count": "Number of beats librosa detects in the clip (0 if none).",
+        "audio": "Raw WAV audio bytes -- pass straight to any feature function (e.g. `audio.main.tempo(audio)`).",
+    },
+    tags={
+        "vgi.title": "Built-in Example Audio Clips",
+        "vgi.doc_llm": _CLIPS_DOC_LLM,
+        "vgi.doc_md": _CLIPS_DOC_MD,
+        "vgi.keywords": json.dumps(
+            ["example", "sample", "demo", "clip", "tone", "click", "test audio", "discovery", "blob"]
+        ),
+        "vgi.category": "metadata",
+        "domain": "audio",
+        "vgi.example_queries": json.dumps(
+            [
+                {
+                    "description": "List the built-in example clips with their core metadata.",
+                    "sql": (
+                        "SELECT name, description, duration, sample_rate, channels "
+                        "FROM audio.main.example_clips ORDER BY name"
+                    ),
+                },
+                {
+                    "description": "Estimate the tempo of the built-in click track by feeding its bytes to tempo().",
+                    "sql": ("SELECT audio.main.tempo(audio) AS bpm FROM audio.main.example_clips WHERE name = 'click'"),
+                },
+            ]
+        ),
+    },
+)
+
+
 TABLE_FUNCTIONS: list[type] = [
     BeatsPathFunction,
     BeatsBytesFunction,
     AudioInfoPathFunction,
     AudioInfoBytesFunction,
 ]
+
+# Browsable discovery tables (each wraps a zero-argument table function). Kept
+# separate from TABLE_FUNCTIONS because these are registered on the schema as
+# `tables`, not as callable table functions.
+DISCOVERY_TABLES: list[Table] = [CLIPS_TABLE]
