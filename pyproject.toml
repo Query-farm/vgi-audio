@@ -44,6 +44,11 @@ dependencies = [
 http = [
     "vgi-python[http]>=0.16.0",
 ]
+# HTTP-serving extra — installed by the Docker image (`pip install .[serve]`).
+# Alias of `http`; named to match the fleet's Docker convention (see vgi-llm).
+serve = [
+    "vgi-python[http]>=0.16.0",
+]
 dev = [
     "pytest>=8",
     "ruff",
@@ -51,6 +56,15 @@ dev = [
     "pydoclint",
 ]
 
+
+[project.scripts]
+# stdio console entry (used by the Docker `stdio` transport and installable via
+# the wheel): warms librosa, then serves the worker over stdin/stdout.
+vgi-audio-worker = "vgi_audio.worker:main"
+
+[project.urls]
+Repository = "https://github.com/Query-farm/vgi-audio"
+Issues = "https://github.com/Query-farm/vgi-audio/issues"
 
 [build-system]
 requires = ["hatchling"]
