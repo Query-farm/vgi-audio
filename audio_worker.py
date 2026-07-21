@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.10.0",
+#     "vgi-python[http]>=0.16.0",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
@@ -52,14 +52,47 @@ from vgi_audio.tables import DISCOVERY_TABLES, TABLE_FUNCTIONS
 _TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
 _CLICK_BLOB_SQL = f"from_base64('{CLICK_WAV_B64}')"
 
-_SCHEMA_EXAMPLE_QUERIES = (
-    f"SELECT audio.main.duration({_TONE_BLOB_SQL}) AS seconds;\n"
-    f"SELECT audio.main.sample_rate({_TONE_BLOB_SQL}) AS hz;\n"
-    f"SELECT audio.main.tempo({_CLICK_BLOB_SQL}) AS bpm;\n"
-    f"SELECT audio.main.spectral_centroid({_TONE_BLOB_SQL}) AS centroid_hz;\n"
-    f"SELECT audio.main.estimated_key({_TONE_BLOB_SQL}) AS musical_key;\n"
-    f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq;\n"
-    f"SELECT * FROM audio.main.audio_info({_TONE_BLOB_SQL});"
+# VGI515: the schema's representative examples must be a JSON list of
+# {description, sql} objects so each carries a human-readable description. Every
+# query is self-contained (inline blob, catalog-qualified) so the linter can run
+# each one against the live worker.
+_SCHEMA_EXAMPLE_QUERIES = json.dumps(
+    [
+        {
+            "description": "Length in seconds of an inline WAV tone.",
+            "sql": f"SELECT audio.main.duration({_TONE_BLOB_SQL}) AS seconds",
+        },
+        {
+            "description": "Native sample rate (Hz) of an inline WAV tone.",
+            "sql": f"SELECT audio.main.sample_rate({_TONE_BLOB_SQL}) AS hz",
+        },
+        {
+            "description": "Estimated tempo (BPM) of an inline 120 BPM click track.",
+            "sql": f"SELECT audio.main.tempo({_CLICK_BLOB_SQL}) AS bpm",
+        },
+        {
+            "description": "Spectral brightness (centroid, Hz) of an inline WAV tone.",
+            "sql": f"SELECT audio.main.spectral_centroid({_TONE_BLOB_SQL}) AS centroid_hz",
+        },
+        {
+            "description": "Heuristic musical key of an inline WAV tone.",
+            "sql": f"SELECT audio.main.estimated_key({_TONE_BLOB_SQL}) AS musical_key",
+        },
+        {
+            "description": "Beat onset times of an inline click track, in order.",
+            "sql": f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+        },
+        {
+            "description": "Combined metadata (duration, sample rate, channels) of an inline WAV tone.",
+            "sql": f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})",
+        },
+        {
+            "description": "Feature table over the built-in example clips: name, duration, and estimated tempo.",
+            "sql": (
+                "SELECT name, duration, audio.main.tempo(audio) AS bpm FROM audio.main.example_clips ORDER BY name"
+            ),
+        },
+    ]
 )
 
 _FUNCTIONS: list[type] = [
@@ -71,9 +104,9 @@ _CATALOG_DESCRIPTION_LLM = (
     "Extract acoustic and musical features from audio files or raw audio bytes directly in SQL. "
     "Scalars return per-file metadata (duration, sample_rate, channels) and signal/spectral/rhythmic "
     "features (tempo in BPM, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
-    "mfcc as DOUBLE[], and a heuristic estimated_key like 'C major'). Table functions return beat onset "
-    "times (beats) and combined metadata (audio_info). Every function accepts either a VARCHAR filesystem "
-    "path the worker opens, or a BLOB of raw audio bytes. Use it to index, filter, or cluster audio "
+    "mfcc as `DOUBLE[]`, and a heuristic estimated_key like 'C major'). Table functions return beat onset "
+    "times (beats) and combined metadata (audio_info). Every function accepts either a `VARCHAR` filesystem "
+    "path the worker opens, or a `BLOB` of raw audio bytes. Use it to index, filter, or cluster audio "
     "collections by their acoustic properties without leaving SQL."
 )
 
@@ -109,7 +142,7 @@ _SCHEMA_DESCRIPTION_LLM = (
     "Audio-feature functions: per-file metadata (duration, sample_rate, channels), signal/spectral/"
     "rhythmic scalars (tempo, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
     "mfcc, estimated_key), and table functions for beat onset times (beats) and combined metadata "
-    "(audio_info). Inputs are a VARCHAR path or a BLOB of audio bytes."
+    "(audio_info). Inputs are a `VARCHAR` path or a `BLOB` of audio bytes."
 )
 
 _SCHEMA_DESCRIPTION_MD = (

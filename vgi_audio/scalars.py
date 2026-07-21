@@ -118,6 +118,9 @@ _TAGS_DURATION = meta.object_tags(
     ),
     keywords=["duration", "length", "seconds", "runtime", "playtime", "audio length", "clip length", "time"],
     category="metadata",
+    example_queries=[
+        ("Duration in seconds of an inline WAV tone.", f"SELECT audio.main.duration({_TONE_BLOB_SQL})"),
+    ],
 )
 
 _TAGS_SAMPLE_RATE = meta.object_tags(
@@ -147,6 +150,9 @@ _TAGS_SAMPLE_RATE = meta.object_tags(
     ),
     keywords=["sample rate", "samplerate", "hz", "frequency", "sampling", "44100", "48000", "khz"],
     category="metadata",
+    example_queries=[
+        ("Native sample rate (Hz) of an inline WAV tone.", f"SELECT audio.main.sample_rate({_TONE_BLOB_SQL})"),
+    ],
 )
 
 _TAGS_CHANNELS = meta.object_tags(
@@ -181,6 +187,9 @@ _TAGS_CHANNELS = meta.object_tags(
     ),
     keywords=["channels", "mono", "stereo", "surround", "channel count", "layout", "multichannel"],
     category="metadata",
+    example_queries=[
+        ("Channel count of an inline WAV tone (1 = mono).", f"SELECT audio.main.channels({_TONE_BLOB_SQL})"),
+    ],
 )
 
 _TAGS_TEMPO = meta.object_tags(
@@ -208,6 +217,9 @@ _TAGS_TEMPO = meta.object_tags(
     ),
     keywords=["tempo", "bpm", "beats per minute", "speed", "pace", "rhythm", "beat"],
     category="rhythm",
+    example_queries=[
+        ("Estimated tempo (BPM) of an inline WAV clip.", f"SELECT audio.main.tempo({_TONE_BLOB_SQL})"),
+    ],
 )
 
 _TAGS_RMS = meta.object_tags(
@@ -238,6 +250,9 @@ _TAGS_RMS = meta.object_tags(
     ),
     keywords=["rms", "energy", "loudness", "level", "amplitude", "volume", "power", "silence"],
     category="loudness",
+    example_queries=[
+        ("Mean RMS energy (loudness proxy) of an inline WAV tone.", f"SELECT audio.main.rms_energy({_TONE_BLOB_SQL})"),
+    ],
 )
 
 _TAGS_ZCR = meta.object_tags(
@@ -267,6 +282,12 @@ _TAGS_ZCR = meta.object_tags(
     ),
     keywords=["zero crossing rate", "zcr", "noisiness", "timbre", "sign changes", "percussive", "voiced"],
     category="spectral",
+    example_queries=[
+        (
+            "Mean zero-crossing rate of an inline WAV tone.",
+            f"SELECT audio.main.zero_crossing_rate({_TONE_BLOB_SQL})",
+        ),
+    ],
 )
 
 _TAGS_CENTROID = meta.object_tags(
@@ -297,6 +318,12 @@ _TAGS_CENTROID = meta.object_tags(
     ),
     keywords=["spectral centroid", "brightness", "timbre", "center of mass", "spectrum", "sharpness"],
     category="spectral",
+    example_queries=[
+        (
+            "Mean spectral centroid (Hz), a brightness measure, of an inline WAV tone.",
+            f"SELECT audio.main.spectral_centroid({_TONE_BLOB_SQL})",
+        ),
+    ],
 )
 
 _TAGS_BANDWIDTH = meta.object_tags(
@@ -325,6 +352,12 @@ _TAGS_BANDWIDTH = meta.object_tags(
     ),
     keywords=["spectral bandwidth", "spread", "spectrum width", "timbre", "broadband", "narrowband"],
     category="spectral",
+    example_queries=[
+        (
+            "Mean spectral bandwidth (Hz), a spectral-spread measure, of an inline WAV tone.",
+            f"SELECT audio.main.spectral_bandwidth({_TONE_BLOB_SQL})",
+        ),
+    ],
 )
 
 _TAGS_MFCC = meta.object_tags(
@@ -358,7 +391,7 @@ _TAGS_MFCC = meta.object_tags(
         "```\n\n"
         "Call it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default "
         "13, clamped to 1..128) sets the vector length, and `audio` is a path or a "
-        "BLOB.\n\n"
+        "`BLOB`.\n\n"
         "**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects "
         "overall loudness, not timbre -- drop or down-weight it for similarity. The "
         "means are unnormalized and per-coefficient scales differ, so z-score them "
@@ -366,6 +399,10 @@ _TAGS_MFCC = meta.object_tags(
     ),
     keywords=["mfcc", "cepstral", "timbre", "feature vector", "fingerprint", "embedding", "similarity", "ml"],
     category="spectral",
+    example_queries=[
+        ("Default 13 MFCC coefficient means of an inline WAV tone.", f"SELECT audio.main.mfcc({_TONE_BLOB_SQL})"),
+        ("Keep 20 MFCC coefficients instead of the default 13.", f"SELECT audio.main.mfcc({_TONE_BLOB_SQL}, 20)"),
+    ],
 )
 
 _TAGS_KEY = meta.object_tags(
@@ -394,6 +431,12 @@ _TAGS_KEY = meta.object_tags(
     ),
     keywords=["key", "musical key", "tonality", "major", "minor", "chroma", "harmonic", "camelot", "scale"],
     category="tonal",
+    example_queries=[
+        (
+            "Heuristic musical key (e.g. 'C major') of an inline WAV tone.",
+            f"SELECT audio.main.estimated_key({_TONE_BLOB_SQL})",
+        ),
+    ],
 )
 
 

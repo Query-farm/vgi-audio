@@ -128,11 +128,16 @@ _TAGS_BEATS = meta.object_tags(
         "Table function -> detected **beat onset times**, one row per beat.\n\n"
         f"{_BEATS_COLUMNS_MD}\n\n"
         "Heuristic beat tracking on a bounded mono signal; returns **no rows** for "
-        "undecodable input or audio without a clear pulse. See the example queries "
-        "for ready-to-run SQL."
+        "undecodable input or audio without a clear pulse."
     ),
     keywords=["beats", "beat tracking", "onsets", "beat grid", "rhythm", "downbeat", "tempo", "timeline"],
     category="rhythm",
+    example_queries=[
+        (
+            "Beat onset times of an inline 120 BPM click track, in order.",
+            f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
+        ),
+    ],
 )
 
 
@@ -281,11 +286,16 @@ _TAGS_INFO = meta.object_tags(
         "Table function -> one row of core **audio metadata**.\n\n"
         f"{_INFO_COLUMNS_MD}\n\n"
         "One row on success; **no rows** for undecodable input. A one-shot "
-        "alternative to the `duration` / `sample_rate` / `channels` scalars. See "
-        "the example queries for ready-to-run SQL."
+        "alternative to the `duration` / `sample_rate` / `channels` scalars."
     ),
     keywords=["audio info", "metadata", "duration", "sample rate", "channels", "probe", "mediainfo", "summary"],
     category="metadata",
+    example_queries=[
+        (
+            "Duration, sample rate, and channel count of an inline WAV tone in one row.",
+            f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})",
+        ),
+    ],
 )
 
 
@@ -496,8 +506,7 @@ _CLIPS_DOC_MD = (
     "| `beat_count` | INTEGER | Number of beats librosa detects in the clip. |\n"
     "| `audio` | BLOB | Raw WAV bytes to feed any feature function. |\n\n"
     "Select the `audio` column of a row and pass it straight into a scalar or "
-    "table function to try the worker with no file on disk. See the example "
-    "queries for ready-to-run SQL."
+    "table function to try the worker with no file on disk."
 )
 
 CLIPS_TABLE = Table(
