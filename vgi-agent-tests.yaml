@@ -1,0 +1,43 @@
+# Private graders for `vgi-lint simulate` (VGI416). The worker publishes only
+# task names and prompts in vgi.agent_test_tasks; the canonical solutions and
+# grading options stay in this repo-root sidecar, which vgi-lint auto-discovers.
+tasks:
+  - name: list-example-clips
+    reference_sql: "SELECT name, duration FROM audio.main.example_clips ORDER BY name"
+    ignore_column_names: true
+  - name: tone-metadata-row
+    reference_sql: "SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+    ignore_column_names: true
+  - name: click-has-beats
+    reference_sql: "SELECT count(*) > 0 AS answer FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))"
+    ignore_column_names: true
+  - name: tone-duration-short
+    reference_sql: "SELECT audio.main.duration(audio) < 1.0 AS answer FROM audio.main.example_clips WHERE name = 'tone'"
+    ignore_column_names: true
+  - name: click-sample-rate-high
+    reference_sql: "SELECT audio.main.sample_rate(audio) >= 5000 AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true
+  - name: tone-is-mono
+    reference_sql: "SELECT audio.main.channels(audio) = 1 AS answer FROM audio.main.example_clips WHERE name = 'tone'"
+    ignore_column_names: true
+  - name: click-tempo-fast
+    reference_sql: "SELECT audio.main.tempo(audio) > 100 AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true
+  - name: click-rms-loud
+    reference_sql: "SELECT audio.main.rms_energy(audio) > 0.1 AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true
+  - name: tone-zcr-low
+    reference_sql: "SELECT audio.main.zero_crossing_rate(audio) < 0.05 AS answer FROM audio.main.example_clips WHERE name = 'tone'"
+    ignore_column_names: true
+  - name: click-centroid-bright
+    reference_sql: "SELECT audio.main.spectral_centroid(audio) > 500 AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true
+  - name: tone-bandwidth-wide
+    reference_sql: "SELECT audio.main.spectral_bandwidth(audio) > 200 AS answer FROM audio.main.example_clips WHERE name = 'tone'"
+    ignore_column_names: true
+  - name: click-mfcc-13
+    reference_sql: "SELECT len(audio.main.mfcc(audio)) = 13 AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true
+  - name: click-key-minor
+    reference_sql: "SELECT audio.main.estimated_key(audio) LIKE '%minor%' AS answer FROM audio.main.example_clips WHERE name = 'click'"
+    ignore_column_names: true

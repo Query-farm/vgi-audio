@@ -55,6 +55,7 @@ def _scalar_bytes(client: Client, name: str, blobs: list, *, positional: list | 
     results = list(
         client.scalar_function(
             function_name=name,
+            schema_path=["main"],
             input=iter([batch]),
             arguments=Arguments(positional=positional or []),
         )
@@ -67,6 +68,7 @@ def _scalar_path(client: Client, name: str, paths: list, *, positional: list | N
     results = list(
         client.scalar_function(
             function_name=name,
+            schema_path=["main"],
             input=iter([batch]),
             arguments=Arguments(positional=positional or []),
         )

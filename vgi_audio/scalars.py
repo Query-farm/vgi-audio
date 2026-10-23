@@ -30,7 +30,7 @@ audio -> NULL (the worker never crashes on hostile bytes).
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Annotated
+from typing import Annotated, Any
 
 import pyarrow as pa
 from vgi.arguments import ConstParam, Param, Returns
@@ -70,14 +70,33 @@ def _tone_example(fn: str, description: str) -> FunctionExample:
 # ---------------------------------------------------------------------------
 
 
-def _map_path[T](arr: pa.StringArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType) -> pa.Array:
+# ``array_cls`` is the concrete Arrow array class ``arrow_type`` builds; it types
+# the result so each ``compute`` keeps its concrete return annotation (which
+# ``Returns()`` infers the SQL type from).
+
+
+def _map_path[T, A: pa.Array[Any]](
+    arr: pa.StringArray,
+    fn: Callable[[AudioInput | None], T],
+    arrow_type: pa.DataType,
+    array_cls: type[A],
+) -> A:
     out = [fn(AudioInput.from_path(x)) for x in arr.to_pylist()]
-    return pa.array(out, type=arrow_type)
+    result = pa.array(out, type=arrow_type)
+    assert isinstance(result, array_cls)
+    return result
 
 
-def _map_bytes[T](arr: pa.BinaryArray, fn: Callable[[AudioInput | None], T], arrow_type: pa.DataType) -> pa.Array:
+def _map_bytes[T, A: pa.Array[Any]](
+    arr: pa.BinaryArray,
+    fn: Callable[[AudioInput | None], T],
+    arrow_type: pa.DataType,
+    array_cls: type[A],
+) -> A:
     out = [fn(AudioInput.from_bytes(x)) for x in arr.to_pylist()]
-    return pa.array(out, type=arrow_type)
+    result = pa.array(out, type=arrow_type)
+    assert isinstance(result, array_cls)
+    return result
 
 
 _PATH_DOC = "Filesystem path to an audio file the worker will open."
@@ -460,7 +479,7 @@ class DurationPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.duration, pa.float64())
+        return _map_path(path, features.duration, pa.float64(), pa.DoubleArray)
 
 
 class DurationBytesFunction(ScalarFunction):
@@ -478,7 +497,7 @@ class DurationBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.duration, pa.float64())
+        return _map_bytes(blob, features.duration, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -501,7 +520,7 @@ class SampleRatePathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.sample_rate, pa.int32())
+        return _map_path(path, features.sample_rate, pa.int32(), pa.Int32Array)
 
 
 class SampleRateBytesFunction(ScalarFunction):
@@ -519,7 +538,7 @@ class SampleRateBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.sample_rate, pa.int32())
+        return _map_bytes(blob, features.sample_rate, pa.int32(), pa.Int32Array)
 
 
 # ===========================================================================
@@ -542,7 +561,7 @@ class ChannelsPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.channels, pa.int32())
+        return _map_path(path, features.channels, pa.int32(), pa.Int32Array)
 
 
 class ChannelsBytesFunction(ScalarFunction):
@@ -560,7 +579,7 @@ class ChannelsBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.Int32Array, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.channels, pa.int32())
+        return _map_bytes(blob, features.channels, pa.int32(), pa.Int32Array)
 
 
 # ===========================================================================
@@ -583,7 +602,7 @@ class TempoPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.tempo, pa.float64())
+        return _map_path(path, features.tempo, pa.float64(), pa.DoubleArray)
 
 
 class TempoBytesFunction(ScalarFunction):
@@ -601,7 +620,7 @@ class TempoBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.tempo, pa.float64())
+        return _map_bytes(blob, features.tempo, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -624,7 +643,7 @@ class RmsEnergyPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.rms_energy, pa.float64())
+        return _map_path(path, features.rms_energy, pa.float64(), pa.DoubleArray)
 
 
 class RmsEnergyBytesFunction(ScalarFunction):
@@ -642,7 +661,7 @@ class RmsEnergyBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.rms_energy, pa.float64())
+        return _map_bytes(blob, features.rms_energy, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -665,7 +684,7 @@ class ZeroCrossingRatePathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.zero_crossing_rate, pa.float64())
+        return _map_path(path, features.zero_crossing_rate, pa.float64(), pa.DoubleArray)
 
 
 class ZeroCrossingRateBytesFunction(ScalarFunction):
@@ -683,7 +702,7 @@ class ZeroCrossingRateBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.zero_crossing_rate, pa.float64())
+        return _map_bytes(blob, features.zero_crossing_rate, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -706,7 +725,7 @@ class SpectralCentroidPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.spectral_centroid, pa.float64())
+        return _map_path(path, features.spectral_centroid, pa.float64(), pa.DoubleArray)
 
 
 class SpectralCentroidBytesFunction(ScalarFunction):
@@ -724,7 +743,7 @@ class SpectralCentroidBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.spectral_centroid, pa.float64())
+        return _map_bytes(blob, features.spectral_centroid, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -747,7 +766,7 @@ class SpectralBandwidthPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.spectral_bandwidth, pa.float64())
+        return _map_path(path, features.spectral_bandwidth, pa.float64(), pa.DoubleArray)
 
 
 class SpectralBandwidthBytesFunction(ScalarFunction):
@@ -765,7 +784,7 @@ class SpectralBandwidthBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.DoubleArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.spectral_bandwidth, pa.float64())
+        return _map_bytes(blob, features.spectral_bandwidth, pa.float64(), pa.DoubleArray)
 
 
 # ===========================================================================
@@ -791,9 +810,9 @@ class MfccPathFunction(ScalarFunction):
     @classmethod
     def compute(
         cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]
-    ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+    ) -> Annotated[pa.Array[Any], Returns(arrow_type=_MFCC_LIST)]:
         """Map each input row to its output value."""
-        return _map_path(path, features.mfcc, _MFCC_LIST)
+        return _map_path(path, features.mfcc, _MFCC_LIST, pa.ListArray)
 
 
 class MfccPathNFunction(ScalarFunction):
@@ -818,9 +837,9 @@ class MfccPathNFunction(ScalarFunction):
         cls,
         path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)],
         n: Annotated[int, ConstParam(_N_DOC)],
-    ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+    ) -> Annotated[pa.Array[Any], Returns(arrow_type=_MFCC_LIST)]:
         """Map each input row to its output value."""
-        return _map_path(path, lambda a: features.mfcc(a, n), _MFCC_LIST)
+        return _map_path(path, lambda a: features.mfcc(a, n), _MFCC_LIST, pa.ListArray)
 
 
 class MfccBytesFunction(ScalarFunction):
@@ -838,9 +857,9 @@ class MfccBytesFunction(ScalarFunction):
     @classmethod
     def compute(
         cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]
-    ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+    ) -> Annotated[pa.Array[Any], Returns(arrow_type=_MFCC_LIST)]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.mfcc, _MFCC_LIST)
+        return _map_bytes(blob, features.mfcc, _MFCC_LIST, pa.ListArray)
 
 
 class MfccBytesNFunction(ScalarFunction):
@@ -865,9 +884,9 @@ class MfccBytesNFunction(ScalarFunction):
         cls,
         blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)],
         n: Annotated[int, ConstParam(_N_DOC)],
-    ) -> Annotated[pa.ListArray, Returns(arrow_type=_MFCC_LIST)]:
+    ) -> Annotated[pa.Array[Any], Returns(arrow_type=_MFCC_LIST)]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, lambda a: features.mfcc(a, n), _MFCC_LIST)
+        return _map_bytes(blob, lambda a: features.mfcc(a, n), _MFCC_LIST, pa.ListArray)
 
 
 # ===========================================================================
@@ -890,7 +909,7 @@ class EstimatedKeyPathFunction(ScalarFunction):
     @classmethod
     def compute(cls, path: Annotated[pa.StringArray, Param(doc=_PATH_DOC)]) -> Annotated[pa.StringArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_path(path, features.estimated_key, pa.string())
+        return _map_path(path, features.estimated_key, pa.string(), pa.StringArray)
 
 
 class EstimatedKeyBytesFunction(ScalarFunction):
@@ -908,7 +927,7 @@ class EstimatedKeyBytesFunction(ScalarFunction):
     @classmethod
     def compute(cls, blob: Annotated[pa.BinaryArray, Param(doc=_BLOB_DOC)]) -> Annotated[pa.StringArray, Returns()]:
         """Map each input row to its output value."""
-        return _map_bytes(blob, features.estimated_key, pa.string())
+        return _map_bytes(blob, features.estimated_key, pa.string(), pa.StringArray)
 
 
 SCALAR_FUNCTIONS: list[type] = [

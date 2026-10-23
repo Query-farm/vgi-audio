@@ -36,7 +36,7 @@ from vgi.table_function import (
 from vgi_rpc.rpc import OutputCollector
 
 from . import features, meta
-from ._example_audio import CLICK_WAV_B64, TONE_WAV_B64
+from ._example_audio import CLICK_FLAC_B64, TONE_WAV_B64
 from .features import AudioInput
 from .schema_utils import field
 
@@ -47,7 +47,7 @@ _BLOB_ARG: Arg[bytes] = Arg(0, arrow_type=pa.binary(), doc="Raw audio bytes (e.g
 # click track with clear onsets for ``beats`` (so it emits multiple rows) and a
 # tone for ``audio_info``. ``from_base64(...)`` yields the ``BLOB`` overload's
 # input, so the strict linter can EXECUTE every example with no file on disk.
-_CLICK_BLOB_SQL = f"from_base64('{CLICK_WAV_B64}')"
+_CLICK_BLOB_SQL = f"from_base64('{CLICK_FLAC_B64}')"
 _TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
 
 # VGI509: at least one object ships guaranteed-runnable executable examples.
@@ -404,7 +404,7 @@ class _NoArgs:
 # (name, description, base64 WAV) for each built-in example clip.
 _EXAMPLE_CLIPS: tuple[tuple[str, str, str], ...] = (
     ("tone", "A short 60 Hz mono sine tone (a steady, tonal test signal).", TONE_WAV_B64),
-    ("click", "A 120 BPM mono click track (sharp, evenly-spaced onsets).", CLICK_WAV_B64),
+    ("click", "A 120 BPM mono click track (sharp, evenly-spaced onsets).", CLICK_FLAC_B64),
 )
 
 _CLIPS_SCHEMA = pa.schema(

@@ -27,20 +27,22 @@ from vgi import Worker
 from vgi.catalog import Catalog, Schema
 
 from vgi_audio import features
-from vgi_audio._example_audio import CLICK_WAV_B64, TONE_WAV_B64
+from vgi_audio._example_audio import TONE_WAV_B64
 from vgi_audio.scalars import SCALAR_FUNCTIONS
 from vgi_audio.tables import DISCOVERY_TABLES, TABLE_FUNCTIONS
 
-# Inline self-contained blobs (see vgi_audio._example_audio) so the schema's
+# Inline self-contained tone blob (see vgi_audio._example_audio) so the schema's
 # representative example queries EXECUTE against the live worker -- a bare path
 # would return no rows in a fresh process.
 _TONE_BLOB_SQL = f"from_base64('{TONE_WAV_B64}')"
-_CLICK_BLOB_SQL = f"from_base64('{CLICK_WAV_B64}')"
 
 # VGI515: the schema's representative examples must be a JSON list of
 # {description, sql} objects so each carries a human-readable description. Every
 # query is self-contained (inline blob, catalog-qualified) so the linter can run
-# each one against the live worker.
+# each one against the live worker. VGI417: the whole value must fit the
+# 4,000-character agent-context bound, so only the ~0.3 KB tone is inlined here;
+# the click clip (~3 KB) appears in the tempo/beats functions' own examples, and
+# the example_clips query below covers it at schema level.
 _SCHEMA_EXAMPLE_QUERIES = json.dumps(
     [
         {
@@ -52,20 +54,12 @@ _SCHEMA_EXAMPLE_QUERIES = json.dumps(
             "sql": f"SELECT audio.main.sample_rate({_TONE_BLOB_SQL}) AS hz",
         },
         {
-            "description": "Estimated tempo (BPM) of an inline 120 BPM click track.",
-            "sql": f"SELECT audio.main.tempo({_CLICK_BLOB_SQL}) AS bpm",
-        },
-        {
             "description": "Spectral brightness (centroid, Hz) of an inline WAV tone.",
             "sql": f"SELECT audio.main.spectral_centroid({_TONE_BLOB_SQL}) AS centroid_hz",
         },
         {
             "description": "Heuristic musical key of an inline WAV tone.",
             "sql": f"SELECT audio.main.estimated_key({_TONE_BLOB_SQL}) AS musical_key",
-        },
-        {
-            "description": "Beat onset times of an inline click track, in order.",
-            "sql": f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
         },
         {
             "description": "Combined metadata (duration, sample rate, channels) of an inline WAV tone.",
@@ -187,9 +181,9 @@ _CATEGORIES_JSON = json.dumps(
 )
 
 # VGI152/VGI407/VGI520: the agent-suitability suite that `vgi-lint simulate`
-# grades (VGI920). Each task is a {name, prompt, reference_sql, ...} object; the
-# prompt is the ONLY field shown to the analyst — reference_sql is a grader-only
-# canonical solution.
+# grades (VGI920). Each task is a public {name, prompt} object; the prompt is the
+# ONLY field shown to the analyst. VGI416: the grader-only fields (``reference_sql``,
+# ``ignore_column_names``) live in the repo-root ``vgi-agent-tests.yaml`` sidecar.
 #
 # Discovery design. Every task points the analyst at the browsable ``example_clips``
 # discovery table (two built-in clips as real rows, with the raw ``audio`` BLOB and
@@ -214,25 +208,19 @@ _CATEGORIES_JSON = json.dumps(
 # analyst actually takes.
 
 
-def _predicate_task(name: str, prompt: str, predicate: str, clip: str) -> dict[str, object]:
-    """A yes/no task: does ``predicate`` (a scalar applied to a clip) hold?
+def _predicate_task(name: str, prompt: str) -> dict[str, object]:
+    """A public yes/no task: does a feature threshold hold for a built-in clip?
 
     Args:
         name: Unique task id.
         prompt: The natural-language yes/no question shown to the analyst.
-        predicate: A boolean SQL expression over the clip's ``audio`` column that
-            calls the feature scalar under test (e.g. ``audio.main.tempo(audio) > 100``).
-        clip: The example-clip name whose row the predicate is evaluated on.
 
     Returns:
-        A ``vgi.agent_test_tasks`` task object (grader-only boolean ``reference_sql``).
+        A public ``vgi.agent_test_tasks`` task object. Its grader (a boolean
+        ``reference_sql`` that calls the feature scalar under test on the clip's
+        ``audio`` column) lives in the repo-root ``vgi-agent-tests.yaml`` (VGI416).
     """
-    return {
-        "name": name,
-        "prompt": prompt,
-        "reference_sql": f"SELECT {predicate} AS answer FROM audio.main.example_clips WHERE name = '{clip}'",
-        "ignore_column_names": True,
-    }
+    return {"name": name, "prompt": prompt}
 
 
 _AGENT_TEST_TASKS_JSON = json.dumps(
@@ -243,8 +231,6 @@ _AGENT_TEST_TASKS_JSON = json.dumps(
                 "The audio catalog ships a small set of built-in example audio clips you can "
                 "experiment with. List them with their name and duration in seconds, ordered by name."
             ),
-            "reference_sql": "SELECT name, duration FROM audio.main.example_clips ORDER BY name",
-            "ignore_column_names": True,
         },
         {
             "name": "tone-metadata-row",
@@ -252,8 +238,6 @@ _AGENT_TEST_TASKS_JSON = json.dumps(
                 "Using the catalog's built-in example clips, return the combined audio metadata "
                 "— duration, sample rate, and channel count — of the clip named 'tone' as a single row."
             ),
-            "reference_sql": (f"SELECT duration, sample_rate, channels FROM audio.main.audio_info({_TONE_BLOB_SQL})"),
-            "ignore_column_names": True,
         },
         {
             "name": "click-has-beats",
@@ -261,75 +245,53 @@ _AGENT_TEST_TASKS_JSON = json.dumps(
                 "The catalog's built-in example clips include one named 'click'. Does that clip "
                 "have any detected beats? Return a single true/false value."
             ),
-            "reference_sql": (f"SELECT count(*) > 0 AS answer FROM audio.main.beats({_CLICK_BLOB_SQL})"),
-            "ignore_column_names": True,
         },
         _predicate_task(
             "tone-duration-short",
             "Is the built-in example clip named 'tone' shorter than 1 second? Return true or false.",
-            "audio.main.duration(audio) < 1.0",
-            "tone",
         ),
         _predicate_task(
             "click-sample-rate-high",
             "Is the native sample rate of the built-in example clip named 'click' at least 5000 Hz? "
             "Return true or false.",
-            "audio.main.sample_rate(audio) >= 5000",
-            "click",
         ),
         _predicate_task(
             "tone-is-mono",
             "Is the built-in example clip named 'tone' mono (exactly one audio channel)? Return true or false.",
-            "audio.main.channels(audio) = 1",
-            "tone",
         ),
         _predicate_task(
             "click-tempo-fast",
             "Is the estimated tempo of the built-in example clip named 'click' greater than 100 BPM? "
             "Return true or false.",
-            "audio.main.tempo(audio) > 100",
-            "click",
         ),
         _predicate_task(
             "click-rms-loud",
             "Is the mean RMS energy of the built-in example clip named 'click' greater than 0.1? Return true or false.",
-            "audio.main.rms_energy(audio) > 0.1",
-            "click",
         ),
         _predicate_task(
             "tone-zcr-low",
             "Is the mean zero-crossing rate of the built-in example clip named 'tone' below 0.05? "
             "Return true or false.",
-            "audio.main.zero_crossing_rate(audio) < 0.05",
-            "tone",
         ),
         _predicate_task(
             "click-centroid-bright",
             "Is the mean spectral centroid of the built-in example clip named 'click' above 500 Hz? "
             "Return true or false.",
-            "audio.main.spectral_centroid(audio) > 500",
-            "click",
         ),
         _predicate_task(
             "tone-bandwidth-wide",
             "Is the mean spectral bandwidth of the built-in example clip named 'tone' greater than 200 Hz? "
             "Return true or false.",
-            "audio.main.spectral_bandwidth(audio) > 200",
-            "tone",
         ),
         _predicate_task(
             "click-mfcc-13",
             "Using the default settings, does the MFCC feature vector of the built-in example clip named "
             "'click' contain exactly 13 coefficients? Return true or false.",
-            "len(audio.main.mfcc(audio)) = 13",
-            "click",
         ),
         _predicate_task(
             "click-key-minor",
             "Is the estimated musical key of the built-in example clip named 'click' a minor key? "
             "Return true or false.",
-            "audio.main.estimated_key(audio) LIKE '%minor%'",
-            "click",
         ),
     ]
 )
@@ -379,7 +341,7 @@ _AUDIO_CATALOG = Catalog(
     },
     schemas=[
         Schema(
-            name="main",
+            path=["main"],
             comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL",
             tags={
                 "vgi.title": "Audio Features — main",
