@@ -46,6 +46,10 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    # Pin the interpreter: the runner uv otherwise picks the newest CPython,
+    # which native deps (numba/llvmlite) may not ship wheels for yet.
+    env:
+      UV_PYTHON: "3.13"
     steps:
       - uses: actions/checkout@v6
 
@@ -73,6 +77,8 @@ jobs:
   metadata-quality:
     name: Metadata quality (vgi-lint)
     runs-on: ubuntu-latest
+    env:
+      UV_PYTHON: "3.13"
     steps:
       - uses: actions/checkout@v6
 
@@ -131,6 +137,8 @@ jobs:
           - { os: ubuntu-latest, asset: haybarn_unittest-linux-amd64.zip }
           - { os: macos-latest,  asset: haybarn_unittest-osx-arm64.zip }
     runs-on: ${{ matrix.os }}
+    env:
+      UV_PYTHON: "3.13"
     defaults:
       run:
         shell: bash

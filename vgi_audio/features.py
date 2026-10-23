@@ -146,6 +146,19 @@ def _run_warm_up() -> None:
     estimated_key(audio)
     tempo(audio)
     beat_times(audio)
+    # The tone above has no percussive onsets, and librosa >= 1.0 aggregates the
+    # onset envelope with a median, so beat_track() returns early on it without
+    # ever reaching the numba beat-tracker kernels (__beat_local_score,
+    # __last_beat_selector, __dp_backtrack, __trim_beats). Left lazy, those cost
+    # ~6-15 s of JIT inside the first beats() query. Drive the tracker once more
+    # on the bundled 120 BPM click track, which has real onsets.
+    import base64  # noqa: PLC0415
+
+    from ._example_audio import CLICK_FLAC_B64  # noqa: PLC0415
+
+    clicks = AudioInput.from_bytes(base64.b64decode(CLICK_FLAC_B64))
+    tempo(clicks)
+    beat_times(clicks)
 
 
 # ---------------------------------------------------------------------------
