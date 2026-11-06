@@ -23,7 +23,7 @@ from typing import Annotated, Any, ClassVar
 
 import pyarrow as pa
 from vgi.arguments import Arg
-from vgi.catalog import Table
+from vgi.catalog import ConstraintInfo, Table, constraint_record
 from vgi.metadata import FunctionExample
 from vgi.table_function import (
     BindParams,
@@ -509,12 +509,41 @@ _CLIPS_DOC_MD = (
     "table function to try the worker with no file on disk."
 )
 
+
+def _trusted(table: str, constraint_id: str, kind: str, columns: list[list[str]]) -> ConstraintInfo:
+    """Build an ENFORCED + ALL_ROWS constraint record for a ``main``-schema table.
+
+    vgi.v3 drops the legacy ``primary_key=`` / ``not_null=`` Table fields: the worker
+    attests constraints with canonical records instead. A PRIMARY_KEY record also makes
+    its columns NOT NULL, so only non-key required columns need a NOT_NULL record. The
+    example clips are generated from fixed built-in data, so every row satisfies these
+    constraints (that is what ENFORCED + ALL_ROWS attests).
+
+    Args:
+        table: Owning table name.
+        constraint_id: Stable provider-owned constraint id, unique within the table.
+        kind: ``"PRIMARY_KEY"`` or ``"NOT_NULL"``.
+        columns: Raw column paths, e.g. ``[["name"]]``.
+
+    Returns:
+        The canonical constraint record.
+    """
+    return constraint_record(
+        ["main"], table, constraint_id, kind, columns, enforcement="ENFORCED", validation="ALL_ROWS"
+    )
+
+
 CLIPS_TABLE = Table(
     name="example_clips",
     function=ExampleClipsFunction,
     comment="Built-in example audio clips (name, core metadata, raw bytes) for trying the feature functions.",
-    primary_key=(("name",),),
-    not_null=("name", "description", "duration", "sample_rate", "channels", "beat_count", "audio"),
+    constraints=(
+        _trusted("example_clips", "pk", "PRIMARY_KEY", [["name"]]),
+        *(
+            _trusted("example_clips", f"{col}_not_null", "NOT_NULL", [[col]])
+            for col in ("description", "duration", "sample_rate", "channels", "beat_count", "audio")
+        ),
+    ),
     column_comments={
         "name": "Short identifier of the example clip (`tone` or `click`).",
         "description": "One-line description of the clip.",

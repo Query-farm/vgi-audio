@@ -8,7 +8,7 @@ statement ok
 LOAD vgi;
 
 statement ok
-ATTACH 'audio' AS audio (TYPE vgi, LOCATION '${VGI_AUDIO_WORKER}');
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION '{VGI_AUDIO_WORKER}');
 
 # ---- spectral centroid of a 440 Hz tone sits in a sane band (NOT an exact float) ----
 
