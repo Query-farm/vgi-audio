@@ -18,7 +18,7 @@ times — as plain SQL functions.
 
 ```sql
 INSTALL vgi FROM community; LOAD vgi;
-ATTACH 'audio' (TYPE vgi, LOCATION 'uv run audio_worker.py');
+ATTACH 'audio' (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.2.0 vgi-audio-worker');
 
 SELECT audio.duration('/tmp/tone.wav');            -- 2.0   (seconds)
 SELECT audio.sample_rate('/tmp/tone.wav');          -- 22050 (Hz)
@@ -35,6 +35,41 @@ SELECT audio.estimated_key('/tmp/tone.wav');        -- 'C major' (heuristic!)
 SELECT * FROM audio.beats('/tmp/click.wav');        -- (seq, time) beat onsets
 SELECT * FROM audio.audio_info('/tmp/tone.wav');    -- (duration, sample_rate, channels)
 ```
+
+## Quick start
+
+The worker isn't on PyPI; [uv](https://docs.astral.sh/uv/) runs it straight from a tagged release on GitHub. `uvx` builds an isolated environment on the first ATTACH and reuses it afterwards:
+
+```sql
+INSTALL vgi FROM community;
+LOAD vgi;
+
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.2.0 vgi-audio-worker');
+
+-- Length in seconds of an inline WAV tone.
+SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg==')) AS seconds;
+
+-- Native sample rate (Hz) of an inline WAV tone.
+SELECT audio.main.sample_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg==')) AS hz;
+```
+
+WAV / FLAC / OGG decode with no external tools; compressed formats (mp3, m4a, ...) need `ffmpeg` on the worker host — see [Supported formats & native dependencies](#supported-formats--native-dependencies).
+
+Change `@v0.2.0` to move to a newer release.
+
+### Other ways to run it
+
+- **Docker** (the image bundles the worker and its dependencies):
+
+  ```sql
+  ATTACH 'audio' AS audio (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-audio:0.2.0');
+  ```
+
+- **From a local checkout** (`git clone https://github.com/Query-farm/vgi-audio`), point `LOCATION` at `uv run --project /path/to/vgi-audio vgi-audio-worker`.
+
+### Build from source
+
+To build the worker yourself, see [Development](#development).
 
 ## Path *or* bytes — the polymorphic audio argument
 
