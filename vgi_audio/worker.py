@@ -303,6 +303,10 @@ _AUDIO_CATALOG = Catalog(
     source_url="https://github.com/Query-farm/vgi-audio",
     tags={
         "vgi.title": "Audio Feature Extraction",
+        # VGI148: one-sentence listing subtitle shown under the title.
+        "vgi.subtitle": (
+            "Measure duration, tempo, loudness, spectral timbre, MFCCs and musical key of audio files with librosa."
+        ),
         # VGI138: keywords must be a JSON array of strings, not a CSV string.
         "vgi.keywords": json.dumps(
             [
@@ -344,7 +348,8 @@ _AUDIO_CATALOG = Catalog(
             path=["main"],
             comment="librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL",
             tags={
-                "vgi.title": "Audio Features — main",
+                # VGI147: a short display name, not a headline.
+                "vgi.title": "Audio Features",
                 # VGI138: keywords must be a JSON array of strings, not a CSV string.
                 "vgi.keywords": json.dumps(
                     [
