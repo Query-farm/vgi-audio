@@ -1,6 +1,6 @@
 [project]
 name = "vgi-audio"
-version = "0.3.0"
+version = "0.4.0"
 description = "Extract audio features (duration, tempo, MFCC, key, ...) from audio paths/bytes for DuckDB via VGI"
 readme = "README.md"
 keywords = [
@@ -30,7 +30,7 @@ classifiers = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "vgi-python>=0.50.0",
+    "vgi-python>=0.51.0",
     "librosa>=0.10",
     "soundfile>=0.12",
     "numpy",
@@ -42,12 +42,12 @@ dependencies = [
 # in addition to stdio. That path needs vgi-python's `http` extra (waitress).
 # CI's http transport leg installs this via `uv sync --extra http`.
 http = [
-    "vgi-python[http]>=0.50.0",
+    "vgi-python[http]>=0.51.0",
 ]
 # HTTP-serving extra — installed by the Docker image (`pip install .[serve]`).
 # Alias of `http`; named to match the fleet's Docker convention (see vgi-llm).
 serve = [
-    "vgi-python[http]>=0.50.0",
+    "vgi-python[http]>=0.51.0",
 ]
 dev = [
     "pytest>=8",
