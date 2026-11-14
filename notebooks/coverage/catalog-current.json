@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "repository": "Query-farm/vgi-audio",
+  "revision": "83d5252f418b4c9a9bc9112599236ab1f399cf3f",
+  "captured_at": "2026-11-14T22:04:25.592183+00:00",
+  "default_schema": "main",
+  "scope": "all_public_functions_and_tables",
+  "complete": true,
+  "evidence": [
+    {
+      "path": "coverage/arguments-current.json",
+      "sha256": "e09ea85d5e98adc7c75e86a30e1c4d198351bddcc0ac2724ffb65716ee76b159",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/audio_info-columns-current.json",
+      "sha256": "2da677dd13685d1aa5f17a94fd02c6f9a580103c251fb9036cc33b6d42194092",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/beats-columns-current.json",
+      "sha256": "713dba8e127203211f39326c4ca03ee5e2c009c7dbd2172c5c4d1fd1927b1839",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/catalog-metadata-current.json",
+      "sha256": "4a6363ceadb181783ef7a7c87e50411dc1dcb2f0528322a3c18980f2f211f1c5",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/example_clips-columns-current.json",
+      "sha256": "e13fdce276a3aa05d05d0c1d7208e569ec0bcb2721769ab8cdc6cedb8bcc5737",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/functions-current.json",
+      "sha256": "ecd8ee8ca65b24baf21215f2bc7cf44d937b30b6721afad2bfc23dd4c48cbabe",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/tables-current.json",
+      "sha256": "3d7749f236a40ede40e9f4c5cba50b8953694571218b18bffc60d2a59491fe0c",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/views-current.json",
+      "sha256": "15da3ae884f06babf4cda64e0d85877065b8aee13dc5c511122ac5fb4d5eebdf",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    },
+    {
+      "path": "coverage/source-compatibility.json",
+      "sha256": "cbaabb13c140687fd3bef9de3fc2b2fd3d86c5b941c668e78544ef8a735629db",
+      "description": "Actual complete runtime functions/tables/views/arguments and table DESCRIBE exports; reviewed source compatibility"
+    }
+  ],
+  "objects": [
+    {
+      "schema": "main",
+      "name": "audio_info",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "audio_info(path VARCHAR) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)",
+        "audio_info(blob BLOB) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "beats",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "beats(path VARCHAR) -> TABLE(seq BIGINT, time DOUBLE)",
+        "beats(blob BLOB) -> TABLE(seq BIGINT, time DOUBLE)"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "channels",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "channels(blob BLOB) -> INTEGER",
+        "channels(path VARCHAR) -> INTEGER"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "duration",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "duration(blob BLOB) -> DOUBLE",
+        "duration(path VARCHAR) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "estimated_key",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "estimated_key(path VARCHAR) -> VARCHAR",
+        "estimated_key(blob BLOB) -> VARCHAR"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "mfcc",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "mfcc(path VARCHAR) -> DOUBLE[]",
+        "mfcc(path VARCHAR, n BIGINT) -> DOUBLE[]",
+        "mfcc(blob BLOB) -> DOUBLE[]",
+        "mfcc(blob BLOB, n BIGINT) -> DOUBLE[]"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "rms_energy",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "rms_energy(path VARCHAR) -> DOUBLE",
+        "rms_energy(blob BLOB) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "sample_rate",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "sample_rate(path VARCHAR) -> INTEGER",
+        "sample_rate(blob BLOB) -> INTEGER"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "spectral_bandwidth",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "spectral_bandwidth(path VARCHAR) -> DOUBLE",
+        "spectral_bandwidth(blob BLOB) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "spectral_centroid",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "spectral_centroid(blob BLOB) -> DOUBLE",
+        "spectral_centroid(path VARCHAR) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "tempo",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "tempo(path VARCHAR) -> DOUBLE",
+        "tempo(blob BLOB) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "zero_crossing_rate",
+      "kind": "function",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "zero_crossing_rate(path VARCHAR) -> DOUBLE",
+        "zero_crossing_rate(blob BLOB) -> DOUBLE"
+      ]
+    },
+    {
+      "schema": "main",
+      "name": "example_clips",
+      "kind": "table",
+      "authentication": "none",
+      "access": "read",
+      "signatures": [
+        "TABLE(name VARCHAR, description VARCHAR, duration DOUBLE, sample_rate INTEGER, channels INTEGER, beat_count INTEGER, audio BLOB)"
+      ]
+    }
+  ],
+  "launch": "uvx --python 3.13 --from git+https://github.com/Query-farm/vgi-audio@83d5252f418b4c9a9bc9112599236ab1f399cf3f vgi-audio-worker",
+  "runtime": "Haybarn2.0.0rc11",
+  "review_notes": "Twenty-six overload rows group into twelve named functions plus example_clips table = thirteen public surfaces. Path/BLOB and MFCC arity overloads retained but count once; no omitted auth/write objects. Tables reject SQL NULL at binding; invalid non-NULL bytes return no rows."
+}

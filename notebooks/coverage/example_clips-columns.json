@@ -1,0 +1,70 @@
+{
+  "query": "DESCRIBE SELECT * FROM audio.main.example_clips",
+  "captured_at": "2026-11-14T21:52:45.218649+00:00",
+  "columns": [
+    "column_name",
+    "column_type",
+    "null",
+    "key",
+    "default",
+    "extra"
+  ],
+  "rows": [
+    [
+      "name",
+      "VARCHAR",
+      "YES",
+      "PRI",
+      null,
+      null
+    ],
+    [
+      "description",
+      "VARCHAR",
+      "NO",
+      null,
+      null,
+      null
+    ],
+    [
+      "duration",
+      "DOUBLE",
+      "NO",
+      null,
+      null,
+      null
+    ],
+    [
+      "sample_rate",
+      "INTEGER",
+      "NO",
+      null,
+      null,
+      null
+    ],
+    [
+      "channels",
+      "INTEGER",
+      "NO",
+      null,
+      null,
+      null
+    ],
+    [
+      "beat_count",
+      "INTEGER",
+      "NO",
+      null,
+      null,
+      null
+    ],
+    [
+      "audio",
+      "BLOB",
+      "NO",
+      null,
+      null,
+      null
+    ]
+  ]
+}

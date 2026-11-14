@@ -1,0 +1,46 @@
+{
+  "query": "SELECT * FROM duckdb_databases() WHERE database_name='audio'",
+  "captured_at": "2026-11-14T22:00:36.911736+00:00",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "path",
+    "comment",
+    "tags",
+    "internal",
+    "type",
+    "readonly",
+    "encrypted",
+    "cipher",
+    "options"
+  ],
+  "rows": [
+    [
+      "audio",
+      22592,
+      null,
+      "librosa audio-feature extraction (duration, tempo, MFCC, key, ...) for SQL.",
+      {
+        "vgi.agent_test_tasks": "[{\"name\": \"list-example-clips\", \"prompt\": \"The audio catalog ships a small set of built-in example audio clips you can experiment with. List them with their name and duration in seconds, ordered by name.\"}, {\"name\": \"tone-metadata-row\", \"prompt\": \"Using the catalog's built-in example clips, return the combined audio metadata \\u2014 duration, sample rate, and channel count \\u2014 of the clip named 'tone' as a single row.\"}, {\"name\": \"click-has-beats\", \"prompt\": \"The catalog's built-in example clips include one named 'click'. Does that clip have any detected beats? Return a single true/false value.\"}, {\"name\": \"tone-duration-short\", \"prompt\": \"Is the built-in example clip named 'tone' shorter than 1 second? Return true or false.\"}, {\"name\": \"click-sample-rate-high\", \"prompt\": \"Is the native sample rate of the built-in example clip named 'click' at least 5000 Hz? Return true or false.\"}, {\"name\": \"tone-is-mono\", \"prompt\": \"Is the built-in example clip named 'tone' mono (exactly one audio channel)? Return true or false.\"}, {\"name\": \"click-tempo-fast\", \"prompt\": \"Is the estimated tempo of the built-in example clip named 'click' greater than 100 BPM? Return true or false.\"}, {\"name\": \"click-rms-loud\", \"prompt\": \"Is the mean RMS energy of the built-in example clip named 'click' greater than 0.1? Return true or false.\"}, {\"name\": \"tone-zcr-low\", \"prompt\": \"Is the mean zero-crossing rate of the built-in example clip named 'tone' below 0.05? Return true or false.\"}, {\"name\": \"click-centroid-bright\", \"prompt\": \"Is the mean spectral centroid of the built-in example clip named 'click' above 500 Hz? Return true or false.\"}, {\"name\": \"tone-bandwidth-wide\", \"prompt\": \"Is the mean spectral bandwidth of the built-in example clip named 'tone' greater than 200 Hz? Return true or false.\"}, {\"name\": \"click-mfcc-13\", \"prompt\": \"Using the default settings, does the MFCC feature vector of the built-in example clip named 'click' contain exactly 13 coefficients? Return true or false.\"}, {\"name\": \"brightest-clip-tempo\", \"prompt\": \"Among the catalog's built-in example clips, find the brightest one (highest mean spectral centroid). Return one row with two columns: the clip name (VARCHAR) and its estimated tempo rounded to the nearest whole BPM as an INTEGER.\"}, {\"name\": \"click-key-minor\", \"prompt\": \"Is the estimated musical key of the built-in example clip named 'click' a minor key? Return true or false.\"}]",
+        "vgi.author": "Query.Farm",
+        "vgi.copyright": "Copyright 2026 Query Farm LLC - https://query.farm",
+        "vgi.doc_llm": "Extract acoustic and musical features from audio files or raw audio bytes directly in SQL. Scalars return per-file metadata (duration, sample_rate, channels) and signal/spectral/rhythmic features (tempo in BPM, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, mfcc as `DOUBLE[]`, and a heuristic estimated_key like 'C major'). Table functions return beat onset times (beats) and combined metadata (audio_info). Every function accepts either a `VARCHAR` filesystem path the worker opens, or a `BLOB` of raw audio bytes. Use it to index, filter, or cluster audio collections by their acoustic properties without leaving SQL.",
+        "vgi.doc_md": "# Audio Feature Extraction in SQL\n\n![librosa logo](https://raw.githubusercontent.com/librosa/librosa/main/docs/img/librosa_logo_text.png)\n\nExtract tempo, timbre, loudness, key, and rhythm descriptors from audio files and raw audio bytes directly in DuckDB SQL \u2014 no separate media pipeline required. The audio catalog turns music information retrieval (MIR) and digital signal processing primitives into ordinary SQL, so you can query, filter, and cluster large audio collections by their acoustic properties using nothing but SELECT.\n\nThis VGI worker is built for data engineers, music-tech developers, and ML practitioners who need audio descriptors without leaving the database. Every feature is computed by [librosa](https://librosa.org/), the de-facto standard Python library for audio and music analysis ([documentation](https://librosa.org/doc/latest/index.html), [source on GitHub](https://github.com/librosa/librosa)). Audio is decoded with libsndfile via [soundfile](https://python-soundfile.readthedocs.io/); WAV, FLAC, and OGG decode natively, while compressed formats such as MP3 and M4A use ffmpeg/audioread when available. DuckDB attaches the worker over Apache Arrow, streaming feature vectors back with zero-copy efficiency.\n\nEvery feature takes the audio two ways \u2014 a filesystem path the worker opens, or a blob of raw audio bytes \u2014 and undecodable or hostile input yields NULL (or no rows) rather than crashing. The features span a handful of families, from cheap per-file metadata and loudness levels through spectral-timbre descriptors and compact cepstral feature vectors to rhythm/beat tracking and a heuristic musical-key estimate; list the schema to browse them. Typical uses include building feature tables for audio search and recommendation, detecting tempo or key across a music library, filtering recordings by loudness or brightness, and generating embeddings for downstream clustering or classification \u2014 all in plain SQL.",
+        "vgi.keywords": "[\"audio\", \"sound\", \"music\", \"librosa\", \"feature extraction\", \"duration\", \"sample rate\", \"channels\", \"tempo\", \"bpm\", \"rms\", \"energy\", \"loudness\", \"zero crossing rate\", \"spectral centroid\", \"spectral bandwidth\", \"mfcc\", \"key\", \"beats\", \"audio analysis\", \"signal processing\"]",
+        "vgi.license": "MIT",
+        "vgi.subtitle": "Measure duration, tempo, loudness, spectral timbre, MFCCs and musical key of audio files with librosa.",
+        "vgi.support_contact": "https://github.com/Query-farm/vgi-audio/issues",
+        "vgi.support_policy_url": "https://github.com/Query-farm/vgi-audio/blob/main/README.md",
+        "vgi.title": "Audio Feature Extraction"
+      },
+      false,
+      "vgi",
+      false,
+      false,
+      null,
+      {
+        "location": "uvx --python 3.13 --from git+https://github.com/Query-farm/vgi-audio@83d5252f418b4c9a9bc9112599236ab1f399cf3f vgi-audio-worker"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,1057 @@
+{
+  "query": "SELECT * FROM duckdb_functions() WHERE database_name='audio' ORDER BY schema_name,function_name",
+  "captured_at": "2026-11-14T22:00:36.887202+00:00",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "function_name",
+    "alias_of",
+    "function_type",
+    "description",
+    "comment",
+    "tags",
+    "return_type",
+    "parameters",
+    "parameter_types",
+    "varargs",
+    "macro_definition",
+    "has_side_effects",
+    "internal",
+    "extension_name",
+    "function_oid",
+    "examples",
+    "stability",
+    "categories"
+  ],
+  "rows": [
+    [
+      "audio",
+      "22592",
+      "main",
+      "audio_info",
+      null,
+      "table",
+      "Single-row (duration, sample_rate, channels) of an audio file path",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.audio_info\n\nA **table function** returning a recording's core metadata in a single row: `(duration DOUBLE, sample_rate INTEGER, channels INTEGER)`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Get duration, sample rate, and channel count in one call instead of three separate scalars -- handy when ingesting a batch of files into a metadata table.\n\n**Output.** Exactly one row on success. Returns **no rows** for `NULL`/undecodable input (it never raises). Equivalent to selecting `duration`, `sample_rate`, and `channels` together.",
+        "vgi.doc_md": "# audio_info\n\nTable function -> one row of core **audio metadata**.\n\n| column | type | description |\n|---|---|---|\n| `duration` | DOUBLE | Duration in seconds. |\n| `sample_rate` | INTEGER | Native sample rate in Hz. |\n| `channels` | INTEGER | Number of audio channels (1=mono, 2=stereo). |\n\nOne row on success; **no rows** for undecodable input. A one-shot alternative to the `duration` / `sample_rate` / `channels` scalars.",
+        "vgi.example_queries": "[{\"description\": \"Duration, sample rate, and channel count of an inline WAV tone in one row.\", \"sql\": \"SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"audio info\", \"metadata\", \"duration\", \"sample rate\", \"channels\", \"probe\", \"mediainfo\", \"summary\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"duration\", \"type\": \"DOUBLE\", \"description\": \"Duration in seconds.\"}, {\"name\": \"sample_rate\", \"type\": \"INTEGER\", \"description\": \"Native sample rate in Hz.\"}, {\"name\": \"channels\", \"type\": \"INTEGER\", \"description\": \"Number of audio channels (1=mono, 2=stereo).\"}]",
+        "vgi.title": "Combined Audio Metadata Row"
+      },
+      null,
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22606,
+      [
+        "SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      null,
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "audio_info",
+      null,
+      "table",
+      "Single-row (duration, sample_rate, channels) of a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.audio_info\n\nA **table function** returning a recording's core metadata in a single row: `(duration DOUBLE, sample_rate INTEGER, channels INTEGER)`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Get duration, sample rate, and channel count in one call instead of three separate scalars -- handy when ingesting a batch of files into a metadata table.\n\n**Output.** Exactly one row on success. Returns **no rows** for `NULL`/undecodable input (it never raises). Equivalent to selecting `duration`, `sample_rate`, and `channels` together.",
+        "vgi.doc_md": "# audio_info\n\nTable function -> one row of core **audio metadata**.\n\n| column | type | description |\n|---|---|---|\n| `duration` | DOUBLE | Duration in seconds. |\n| `sample_rate` | INTEGER | Native sample rate in Hz. |\n| `channels` | INTEGER | Number of audio channels (1=mono, 2=stereo). |\n\nOne row on success; **no rows** for undecodable input. A one-shot alternative to the `duration` / `sample_rate` / `channels` scalars.",
+        "vgi.example_queries": "[{\"description\": \"Duration, sample rate, and channel count of an inline WAV tone in one row.\", \"sql\": \"SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"audio info\", \"metadata\", \"duration\", \"sample rate\", \"channels\", \"probe\", \"mediainfo\", \"summary\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"duration\", \"type\": \"DOUBLE\", \"description\": \"Duration in seconds.\"}, {\"name\": \"sample_rate\", \"type\": \"INTEGER\", \"description\": \"Native sample rate in Hz.\"}, {\"name\": \"channels\", \"type\": \"INTEGER\", \"description\": \"Number of audio channels (1=mono, 2=stereo).\"}]",
+        "vgi.title": "Combined Audio Metadata Row"
+      },
+      null,
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22606,
+      [
+        "SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      null,
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "beats",
+      null,
+      "table",
+      "Beat onset times (seq, time) of an audio file path",
+      null,
+      {
+        "vgi.category": "rhythm",
+        "vgi.doc_llm": "## audio.beats\n\nA **table function** that returns the **detected beat onset times** of a recording, one row per beat: `(seq BIGINT, time DOUBLE)`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Build a beat grid for visualisation or editing, segment a track on its beats, count beats, or align events to the rhythm.\n\n**Output.** `seq` is the 0-based, ascending beat index; `time` is the onset in seconds. Beats are found by librosa's beat tracker on a bounded mono signal -- a **heuristic**, strongest on material with a clear pulse. Returns **no rows** for `NULL`/undecodable input or audio with no detectable beat; it never raises.",
+        "vgi.doc_md": "# beats\n\nTable function -> detected **beat onset times**, one row per beat.\n\n| column | type | description |\n|---|---|---|\n| `seq` | BIGINT | 0-based beat index (ascending). |\n| `time` | DOUBLE | Beat onset time in seconds. |\n\nHeuristic beat tracking on a bounded mono signal; returns **no rows** for undecodable input or audio without a clear pulse.",
+        "vgi.example_queries": "[{\"description\": \"Beat onset times of an inline 120 BPM click track, in order.\", \"sql\": \"SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq\"}, {\"description\": \"Derive a BPM from the median gap between consecutive beat onsets of the built-in 120 BPM click track and set it beside the tempo() estimate for the same clip.\", \"sql\": \"WITH grid AS (SELECT time - lag(time) OVER (ORDER BY seq) AS gap FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))) SELECT round(60.0 / median(gap), 1) AS grid_bpm, (SELECT round(audio.main.tempo(audio), 1) FROM audio.main.example_clips WHERE name = 'click') AS tracker_bpm FROM grid\"}]",
+        "vgi.executable_examples": "[{\"description\": \"Beat onset times of an inline 120 BPM click track.\", \"sql\": \"SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq\"},{\"description\": \"Duration / sample rate / channels of an inline WAV tone.\", \"sql\": \"SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"beats\", \"beat tracking\", \"onsets\", \"beat grid\", \"rhythm\", \"downbeat\", \"tempo\", \"timeline\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"seq\", \"type\": \"BIGINT\", \"description\": \"0-based beat index (ascending).\"}, {\"name\": \"time\", \"type\": \"DOUBLE\", \"description\": \"Beat onset time in seconds.\"}]",
+        "vgi.title": "Beat Onset Times Table"
+      },
+      null,
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22607,
+      [
+        "SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq",
+        "WITH grid AS (SELECT time - lag(time) OVER (ORDER BY seq) AS gap FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))) SELECT round(60.0 / median(gap), 1) AS grid_bpm, (SELECT round(audio.main.tempo(audio), 1) FROM audio.main.example_clips WHERE name = 'click') AS tracker_bpm FROM grid"
+      ],
+      null,
+      [
+        "audio",
+        "rhythm"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "beats",
+      null,
+      "table",
+      "Beat onset times (seq, time) of a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "rhythm",
+        "vgi.doc_llm": "## audio.beats\n\nA **table function** that returns the **detected beat onset times** of a recording, one row per beat: `(seq BIGINT, time DOUBLE)`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Build a beat grid for visualisation or editing, segment a track on its beats, count beats, or align events to the rhythm.\n\n**Output.** `seq` is the 0-based, ascending beat index; `time` is the onset in seconds. Beats are found by librosa's beat tracker on a bounded mono signal -- a **heuristic**, strongest on material with a clear pulse. Returns **no rows** for `NULL`/undecodable input or audio with no detectable beat; it never raises.",
+        "vgi.doc_md": "# beats\n\nTable function -> detected **beat onset times**, one row per beat.\n\n| column | type | description |\n|---|---|---|\n| `seq` | BIGINT | 0-based beat index (ascending). |\n| `time` | DOUBLE | Beat onset time in seconds. |\n\nHeuristic beat tracking on a bounded mono signal; returns **no rows** for undecodable input or audio without a clear pulse.",
+        "vgi.example_queries": "[{\"description\": \"Beat onset times of an inline 120 BPM click track, in order.\", \"sql\": \"SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq\"}, {\"description\": \"Derive a BPM from the median gap between consecutive beat onsets of the built-in 120 BPM click track and set it beside the tempo() estimate for the same clip.\", \"sql\": \"WITH grid AS (SELECT time - lag(time) OVER (ORDER BY seq) AS gap FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))) SELECT round(60.0 / median(gap), 1) AS grid_bpm, (SELECT round(audio.main.tempo(audio), 1) FROM audio.main.example_clips WHERE name = 'click') AS tracker_bpm FROM grid\"}]",
+        "vgi.executable_examples": "[{\"description\": \"Beat onset times of an inline 120 BPM click track.\", \"sql\": \"SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq\"},{\"description\": \"Duration / sample rate / channels of an inline WAV tone.\", \"sql\": \"SELECT duration, sample_rate, channels FROM audio.main.audio_info(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"beats\", \"beat tracking\", \"onsets\", \"beat grid\", \"rhythm\", \"downbeat\", \"tempo\", \"timeline\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"seq\", \"type\": \"BIGINT\", \"description\": \"0-based beat index (ascending).\"}, {\"name\": \"time\", \"type\": \"DOUBLE\", \"description\": \"Beat onset time in seconds.\"}]",
+        "vgi.title": "Beat Onset Times Table"
+      },
+      null,
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22607,
+      [
+        "SELECT seq, time FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY=')) ORDER BY seq",
+        "WITH grid AS (SELECT time - lag(time) OVER (ORDER BY seq) AS gap FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))) SELECT round(60.0 / median(gap), 1) AS grid_bpm, (SELECT round(audio.main.tempo(audio), 1) FROM audio.main.example_clips WHERE name = 'click') AS tracker_bpm FROM grid"
+      ],
+      null,
+      [
+        "audio",
+        "rhythm"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "channels",
+      null,
+      "scalar",
+      "Number of audio channels (1=mono, 2=stereo), from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.channels\n\nReturn the **number of audio channels** in a recording as an `INTEGER` (`1` = mono, `2` = stereo, higher for surround). Accepts either a `VARCHAR` filesystem path or a `BLOB` of raw audio bytes.\n\n**When to use.** Separate mono from stereo material, flag unexpected channel layouts before mixing, or pick a down-mix strategy.\n\n**Behavior.** The count is read from the container header, which is exact for WAV/FLAC/OGG. Only when the header cannot be read does the worker fall back to a decode, and because that analysis path is mono it then reports `1` -- so a `1` from a header-less source means 'decodable as mono', not a guaranteed true channel count. Returns `NULL` for `NULL` input and for anything undecodable; it never raises.",
+        "vgi.doc_md": "# channels\n\nNumber of **audio channels** (`INTEGER`): `1` = mono, `2` = stereo, more for surround.\n\n```sql\n-- Path input:\nSELECT audio.main.channels('/music/track.wav');\n-- Bytes input (a BLOB column or literal):\nSELECT audio.main.channels(audio_bytes);\n```\n\nRead from the file header (exact for WAV/FLAC/OGG). If only a decode is possible the worker's mono analysis path reports `1`. `NULL` for `NULL` or undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Channel count of an inline WAV tone (1 = mono).\", \"sql\": \"SELECT audio.main.channels(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"channels\", \"mono\", \"stereo\", \"surround\", \"channel count\", \"layout\", \"multichannel\"]",
+        "vgi.title": "Audio Channel Count"
+      },
+      "INTEGER",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22596,
+      [
+        "SELECT audio.main.channels(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "channels",
+      null,
+      "scalar",
+      "Number of audio channels (1=mono, 2=stereo), from a file path",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.channels\n\nReturn the **number of audio channels** in a recording as an `INTEGER` (`1` = mono, `2` = stereo, higher for surround). Accepts either a `VARCHAR` filesystem path or a `BLOB` of raw audio bytes.\n\n**When to use.** Separate mono from stereo material, flag unexpected channel layouts before mixing, or pick a down-mix strategy.\n\n**Behavior.** The count is read from the container header, which is exact for WAV/FLAC/OGG. Only when the header cannot be read does the worker fall back to a decode, and because that analysis path is mono it then reports `1` -- so a `1` from a header-less source means 'decodable as mono', not a guaranteed true channel count. Returns `NULL` for `NULL` input and for anything undecodable; it never raises.",
+        "vgi.doc_md": "# channels\n\nNumber of **audio channels** (`INTEGER`): `1` = mono, `2` = stereo, more for surround.\n\n```sql\n-- Path input:\nSELECT audio.main.channels('/music/track.wav');\n-- Bytes input (a BLOB column or literal):\nSELECT audio.main.channels(audio_bytes);\n```\n\nRead from the file header (exact for WAV/FLAC/OGG). If only a decode is possible the worker's mono analysis path reports `1`. `NULL` for `NULL` or undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Channel count of an inline WAV tone (1 = mono).\", \"sql\": \"SELECT audio.main.channels(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"channels\", \"mono\", \"stereo\", \"surround\", \"channel count\", \"layout\", \"multichannel\"]",
+        "vgi.title": "Audio Channel Count"
+      },
+      "INTEGER",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22596,
+      [
+        "SELECT audio.main.channels(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "duration",
+      null,
+      "scalar",
+      "Audio duration in seconds, from a BLOB of audio bytes (NULL if undecodable)",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.duration\n\nReturn the **length of an audio recording in seconds** as a `DOUBLE`. Accepts either a `VARCHAR` filesystem path (the worker opens the file) or a `BLOB` of raw audio bytes.\n\n**When to use.** Filter or sort a table of recordings by length, compute total library duration, or skip clips that are too short/long before running heavier analysis.\n\n**Behavior.** Uses the container's native frame count when it can be probed (exact and cheap); otherwise decodes the stream to measure it. Returns `NULL` for `NULL` input and for anything that cannot be decoded (missing file, corrupt or unsupported bytes) -- it never raises.",
+        "vgi.doc_md": "# duration\n\nAudio duration in **seconds** (`DOUBLE`).\n\n```sql\nSELECT audio.main.duration('/music/track.flac');   -- e.g. 213.4\n```\n\nReads the native frame count when available, else decodes to measure; works equally over a file path or a column of raw audio bytes. `NULL` for undecodable or `NULL` input.",
+        "vgi.example_queries": "[{\"description\": \"Duration in seconds of an inline WAV tone.\", \"sql\": \"SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"duration\", \"length\", \"seconds\", \"runtime\", \"playtime\", \"audio length\", \"clip length\", \"time\"]",
+        "vgi.title": "Audio Duration (Seconds)"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22597,
+      [
+        "SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "duration",
+      null,
+      "scalar",
+      "Audio duration in seconds, from a file path (NULL if undecodable)",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.duration\n\nReturn the **length of an audio recording in seconds** as a `DOUBLE`. Accepts either a `VARCHAR` filesystem path (the worker opens the file) or a `BLOB` of raw audio bytes.\n\n**When to use.** Filter or sort a table of recordings by length, compute total library duration, or skip clips that are too short/long before running heavier analysis.\n\n**Behavior.** Uses the container's native frame count when it can be probed (exact and cheap); otherwise decodes the stream to measure it. Returns `NULL` for `NULL` input and for anything that cannot be decoded (missing file, corrupt or unsupported bytes) -- it never raises.",
+        "vgi.doc_md": "# duration\n\nAudio duration in **seconds** (`DOUBLE`).\n\n```sql\nSELECT audio.main.duration('/music/track.flac');   -- e.g. 213.4\n```\n\nReads the native frame count when available, else decodes to measure; works equally over a file path or a column of raw audio bytes. `NULL` for undecodable or `NULL` input.",
+        "vgi.example_queries": "[{\"description\": \"Duration in seconds of an inline WAV tone.\", \"sql\": \"SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"duration\", \"length\", \"seconds\", \"runtime\", \"playtime\", \"audio length\", \"clip length\", \"time\"]",
+        "vgi.title": "Audio Duration (Seconds)"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22597,
+      [
+        "SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "estimated_key",
+      null,
+      "scalar",
+      "Heuristic chroma-based musical key estimate, e.g. 'C major', from a file path",
+      null,
+      {
+        "vgi.category": "tonal",
+        "vgi.doc_llm": "## audio.estimated_key\n\nEstimate the **musical key** of a recording, e.g. `'C major'` or `'A minor'`, as a `VARCHAR`. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Tag a music library by key for harmonic mixing (DJ-style), find compatible tracks, or filter by tonality.\n\n**Behavior.** A **heuristic** Krumhansl-Schmuckler correlation of the chroma profile against the 24 major/minor key templates -- treat it as a hint, not ground truth (it can confuse relative major/minor and struggles on atonal/percussive material). `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# estimated_key\n\nHeuristic **musical key** (`VARCHAR`), e.g. `'C major'`.\n\n```sql\nSELECT audio.main.estimated_key('/music/track.wav');\n```\n\n> Krumhansl-Schmuckler chroma heuristic -- a hint, not ground truth. May confuse relative major/minor. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Heuristic musical key (e.g. 'C major') of an inline WAV tone.\", \"sql\": \"SELECT audio.main.estimated_key(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"key\", \"musical key\", \"tonality\", \"major\", \"minor\", \"chroma\", \"harmonic\", \"camelot\", \"scale\"]",
+        "vgi.title": "Estimated Musical Key"
+      },
+      "VARCHAR",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22598,
+      [
+        "SELECT audio.main.estimated_key(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "harmony"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "estimated_key",
+      null,
+      "scalar",
+      "Heuristic chroma-based musical key estimate, e.g. 'C major', from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "tonal",
+        "vgi.doc_llm": "## audio.estimated_key\n\nEstimate the **musical key** of a recording, e.g. `'C major'` or `'A minor'`, as a `VARCHAR`. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Tag a music library by key for harmonic mixing (DJ-style), find compatible tracks, or filter by tonality.\n\n**Behavior.** A **heuristic** Krumhansl-Schmuckler correlation of the chroma profile against the 24 major/minor key templates -- treat it as a hint, not ground truth (it can confuse relative major/minor and struggles on atonal/percussive material). `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# estimated_key\n\nHeuristic **musical key** (`VARCHAR`), e.g. `'C major'`.\n\n```sql\nSELECT audio.main.estimated_key('/music/track.wav');\n```\n\n> Krumhansl-Schmuckler chroma heuristic -- a hint, not ground truth. May confuse relative major/minor. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Heuristic musical key (e.g. 'C major') of an inline WAV tone.\", \"sql\": \"SELECT audio.main.estimated_key(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"key\", \"musical key\", \"tonality\", \"major\", \"minor\", \"chroma\", \"harmonic\", \"camelot\", \"scale\"]",
+        "vgi.title": "Estimated Musical Key"
+      },
+      "VARCHAR",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22598,
+      [
+        "SELECT audio.main.estimated_key(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "harmony"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "mfcc",
+      null,
+      "scalar",
+      "Mean of each of 13 MFCC coefficients, from a file path",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.mfcc\n\nReturn the **mean of each Mel-frequency cepstral coefficient (MFCC)** over the whole clip as a `DOUBLE[]` -- a compact timbral fingerprint.\n\n**Signature.** `mfcc(audio)` or `mfcc(audio, n)`. `audio` is a `VARCHAR` path or a `BLOB` of raw bytes; the optional `n` sets how many coefficients to keep (default `13`, clamped to `[1, 128]`), and the result is a length-`n` list of per-coefficient means.\n\n**When to use.** A ready-made feature vector for audio similarity search, clustering, or classification -- store the list per recording and compare with a distance metric.\n\n**Caveats for ML.** The first coefficient (`MFCC-0`) tracks overall log-energy/loudness rather than timbre and can dominate a raw Euclidean distance -- drop it or weight it down for timbral similarity. The means are unnormalized and the coefficients live on different scales, so standardize (z-score) them across your corpus before computing distances. Averaging over the whole clip also discards how timbre evolves over time. Returns `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# mfcc\n\nPer-coefficient **MFCC means** over the clip as a `DOUBLE[]` (a timbral fingerprint).\n\n```sql\nSELECT audio.main.mfcc('/music/track.wav');       -- 13 coefficient means\nSELECT audio.main.mfcc('/music/track.wav', 20);   -- keep 20 instead\n```\n\nCall it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default 13, clamped to 1..128) sets the vector length, and `audio` is a path or a `BLOB`.\n\n**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects overall loudness, not timbre -- drop or down-weight it for similarity. The means are unnormalized and per-coefficient scales differ, so z-score them across your data before Euclidean distance. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Default 13 MFCC coefficient means of an inline WAV tone.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}, {\"description\": \"Keep 20 MFCC coefficients instead of the default 13.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)\"}, {\"description\": \"Timbre distance between each pair of built-in clips: Euclidean distance between their default MFCC means with MFCC-0 (overall loudness) dropped; smaller means more alike.\", \"sql\": \"SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip\"}]",
+        "vgi.keywords": "[\"mfcc\", \"cepstral\", \"timbre\", \"feature vector\", \"fingerprint\", \"embedding\", \"similarity\", \"ml\"]",
+        "vgi.title": "MFCC Coefficient Means"
+      },
+      "DOUBLE[]",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))",
+        "SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "mfcc",
+      null,
+      "scalar",
+      "Mean of each of n MFCC coefficients, from a file path",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.mfcc\n\nReturn the **mean of each Mel-frequency cepstral coefficient (MFCC)** over the whole clip as a `DOUBLE[]` -- a compact timbral fingerprint.\n\n**Signature.** `mfcc(audio)` or `mfcc(audio, n)`. `audio` is a `VARCHAR` path or a `BLOB` of raw bytes; the optional `n` sets how many coefficients to keep (default `13`, clamped to `[1, 128]`), and the result is a length-`n` list of per-coefficient means.\n\n**When to use.** A ready-made feature vector for audio similarity search, clustering, or classification -- store the list per recording and compare with a distance metric.\n\n**Caveats for ML.** The first coefficient (`MFCC-0`) tracks overall log-energy/loudness rather than timbre and can dominate a raw Euclidean distance -- drop it or weight it down for timbral similarity. The means are unnormalized and the coefficients live on different scales, so standardize (z-score) them across your corpus before computing distances. Averaging over the whole clip also discards how timbre evolves over time. Returns `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# mfcc\n\nPer-coefficient **MFCC means** over the clip as a `DOUBLE[]` (a timbral fingerprint).\n\n```sql\nSELECT audio.main.mfcc('/music/track.wav');       -- 13 coefficient means\nSELECT audio.main.mfcc('/music/track.wav', 20);   -- keep 20 instead\n```\n\nCall it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default 13, clamped to 1..128) sets the vector length, and `audio` is a path or a `BLOB`.\n\n**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects overall loudness, not timbre -- drop or down-weight it for similarity. The means are unnormalized and per-coefficient scales differ, so z-score them across your data before Euclidean distance. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Default 13 MFCC coefficient means of an inline WAV tone.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}, {\"description\": \"Keep 20 MFCC coefficients instead of the default 13.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)\"}, {\"description\": \"Timbre distance between each pair of built-in clips: Euclidean distance between their default MFCC means with MFCC-0 (overall loudness) dropped; smaller means more alike.\", \"sql\": \"SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip\"}]",
+        "vgi.keywords": "[\"mfcc\", \"cepstral\", \"timbre\", \"feature vector\", \"fingerprint\", \"embedding\", \"similarity\", \"ml\"]",
+        "vgi.title": "MFCC Coefficient Means"
+      },
+      "DOUBLE[]",
+      [
+        "path",
+        "n"
+      ],
+      [
+        "VARCHAR",
+        "BIGINT"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "mfcc",
+      null,
+      "scalar",
+      "Mean of each of 13 MFCC coefficients, from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.mfcc\n\nReturn the **mean of each Mel-frequency cepstral coefficient (MFCC)** over the whole clip as a `DOUBLE[]` -- a compact timbral fingerprint.\n\n**Signature.** `mfcc(audio)` or `mfcc(audio, n)`. `audio` is a `VARCHAR` path or a `BLOB` of raw bytes; the optional `n` sets how many coefficients to keep (default `13`, clamped to `[1, 128]`), and the result is a length-`n` list of per-coefficient means.\n\n**When to use.** A ready-made feature vector for audio similarity search, clustering, or classification -- store the list per recording and compare with a distance metric.\n\n**Caveats for ML.** The first coefficient (`MFCC-0`) tracks overall log-energy/loudness rather than timbre and can dominate a raw Euclidean distance -- drop it or weight it down for timbral similarity. The means are unnormalized and the coefficients live on different scales, so standardize (z-score) them across your corpus before computing distances. Averaging over the whole clip also discards how timbre evolves over time. Returns `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# mfcc\n\nPer-coefficient **MFCC means** over the clip as a `DOUBLE[]` (a timbral fingerprint).\n\n```sql\nSELECT audio.main.mfcc('/music/track.wav');       -- 13 coefficient means\nSELECT audio.main.mfcc('/music/track.wav', 20);   -- keep 20 instead\n```\n\nCall it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default 13, clamped to 1..128) sets the vector length, and `audio` is a path or a `BLOB`.\n\n**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects overall loudness, not timbre -- drop or down-weight it for similarity. The means are unnormalized and per-coefficient scales differ, so z-score them across your data before Euclidean distance. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Default 13 MFCC coefficient means of an inline WAV tone.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}, {\"description\": \"Keep 20 MFCC coefficients instead of the default 13.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)\"}, {\"description\": \"Timbre distance between each pair of built-in clips: Euclidean distance between their default MFCC means with MFCC-0 (overall loudness) dropped; smaller means more alike.\", \"sql\": \"SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip\"}]",
+        "vgi.keywords": "[\"mfcc\", \"cepstral\", \"timbre\", \"feature vector\", \"fingerprint\", \"embedding\", \"similarity\", \"ml\"]",
+        "vgi.title": "MFCC Coefficient Means"
+      },
+      "DOUBLE[]",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))",
+        "SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "mfcc",
+      null,
+      "scalar",
+      "Mean of each of n MFCC coefficients, from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.mfcc\n\nReturn the **mean of each Mel-frequency cepstral coefficient (MFCC)** over the whole clip as a `DOUBLE[]` -- a compact timbral fingerprint.\n\n**Signature.** `mfcc(audio)` or `mfcc(audio, n)`. `audio` is a `VARCHAR` path or a `BLOB` of raw bytes; the optional `n` sets how many coefficients to keep (default `13`, clamped to `[1, 128]`), and the result is a length-`n` list of per-coefficient means.\n\n**When to use.** A ready-made feature vector for audio similarity search, clustering, or classification -- store the list per recording and compare with a distance metric.\n\n**Caveats for ML.** The first coefficient (`MFCC-0`) tracks overall log-energy/loudness rather than timbre and can dominate a raw Euclidean distance -- drop it or weight it down for timbral similarity. The means are unnormalized and the coefficients live on different scales, so standardize (z-score) them across your corpus before computing distances. Averaging over the whole clip also discards how timbre evolves over time. Returns `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# mfcc\n\nPer-coefficient **MFCC means** over the clip as a `DOUBLE[]` (a timbral fingerprint).\n\n```sql\nSELECT audio.main.mfcc('/music/track.wav');       -- 13 coefficient means\nSELECT audio.main.mfcc('/music/track.wav', 20);   -- keep 20 instead\n```\n\nCall it as `mfcc(audio)` or `mfcc(audio, n)`: the optional `n` (default 13, clamped to 1..128) sets the vector length, and `audio` is a path or a `BLOB`.\n\n**Using it as an ML feature.** `MFCC-0` (the first entry) mostly reflects overall loudness, not timbre -- drop or down-weight it for similarity. The means are unnormalized and per-coefficient scales differ, so z-score them across your data before Euclidean distance. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Default 13 MFCC coefficient means of an inline WAV tone.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}, {\"description\": \"Keep 20 MFCC coefficients instead of the default 13.\", \"sql\": \"SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)\"}, {\"description\": \"Timbre distance between each pair of built-in clips: Euclidean distance between their default MFCC means with MFCC-0 (overall loudness) dropped; smaller means more alike.\", \"sql\": \"SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip\"}]",
+        "vgi.keywords": "[\"mfcc\", \"cepstral\", \"timbre\", \"feature vector\", \"fingerprint\", \"embedding\", \"similarity\", \"ml\"]",
+        "vgi.title": "MFCC Coefficient Means"
+      },
+      "DOUBLE[]",
+      [
+        "blob",
+        "n"
+      ],
+      [
+        "BLOB",
+        "BIGINT"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT audio.main.mfcc(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='), 20)"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "rms_energy",
+      null,
+      "scalar",
+      "Mean root-mean-square energy of the signal, from a file path",
+      null,
+      {
+        "vgi.category": "loudness",
+        "vgi.doc_llm": "## audio.rms_energy\n\nReturn the **mean root-mean-square (RMS) energy** of the waveform as a `DOUBLE` -- a loudness/level proxy. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Rank recordings by overall loudness, detect near-silent or clipped/hot clips, or normalise levels across a collection.\n\n**Behavior.** The RMS amplitude is computed per short analysis frame over a bounded mono signal and then averaged. Values are a unitless linear amplitude (not decibels), roughly `0`..`1` for normalised audio -- take `20*log10(x)` for a dBFS-like figure. It reflects signal level, not perceived loudness (no A/K-weighting). `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# rms_energy\n\nMean **RMS energy** (`DOUBLE`) -- a loudness proxy.\n\n```sql\nSELECT audio.main.rms_energy('/music/track.wav');\n```\n\nHigher means louder; near `0` means near-silent. Linear amplitude (~`0`..`1`), not dB -- use `20*log10(x)` for dBFS. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean RMS energy (loudness proxy) of an inline WAV tone.\", \"sql\": \"SELECT audio.main.rms_energy(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"rms\", \"energy\", \"loudness\", \"level\", \"amplitude\", \"volume\", \"power\", \"silence\"]",
+        "vgi.title": "Mean RMS Energy Level"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22600,
+      [
+        "SELECT audio.main.rms_energy(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "energy"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "rms_energy",
+      null,
+      "scalar",
+      "Mean root-mean-square energy of the signal, from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "loudness",
+        "vgi.doc_llm": "## audio.rms_energy\n\nReturn the **mean root-mean-square (RMS) energy** of the waveform as a `DOUBLE` -- a loudness/level proxy. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Rank recordings by overall loudness, detect near-silent or clipped/hot clips, or normalise levels across a collection.\n\n**Behavior.** The RMS amplitude is computed per short analysis frame over a bounded mono signal and then averaged. Values are a unitless linear amplitude (not decibels), roughly `0`..`1` for normalised audio -- take `20*log10(x)` for a dBFS-like figure. It reflects signal level, not perceived loudness (no A/K-weighting). `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# rms_energy\n\nMean **RMS energy** (`DOUBLE`) -- a loudness proxy.\n\n```sql\nSELECT audio.main.rms_energy('/music/track.wav');\n```\n\nHigher means louder; near `0` means near-silent. Linear amplitude (~`0`..`1`), not dB -- use `20*log10(x)` for dBFS. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean RMS energy (loudness proxy) of an inline WAV tone.\", \"sql\": \"SELECT audio.main.rms_energy(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"rms\", \"energy\", \"loudness\", \"level\", \"amplitude\", \"volume\", \"power\", \"silence\"]",
+        "vgi.title": "Mean RMS Energy Level"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22600,
+      [
+        "SELECT audio.main.rms_energy(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "energy"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "sample_rate",
+      null,
+      "scalar",
+      "Native sample rate in Hz, from a file path (NULL if undecodable)",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.sample_rate\n\nReturn the recording's **native sample rate in Hz** (e.g. 44100, 48000) as an `INTEGER`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Group or validate a collection by sample rate, detect downsampled material, or decide resampling before further processing.\n\n**Behavior.** Read straight from the container header when possible; for formats that can't be probed, a brief decode recovers the source rate. This is the recording's **native/original** rate -- note the feature scalars (tempo, spectral, mfcc, ...) internally resample to 22.05 kHz for analysis, so their results are independent of this value. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# sample_rate\n\nNative **sample rate in Hz** (`INTEGER`), e.g. `44100`.\n\n```sql\nSELECT audio.main.sample_rate('/music/track.wav');\n```\n\nThe recording's original rate, taken from the file header where available (the analysis features resample to 22.05 kHz regardless). Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Native sample rate (Hz) of an inline WAV tone.\", \"sql\": \"SELECT audio.main.sample_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"sample rate\", \"samplerate\", \"hz\", \"frequency\", \"sampling\", \"44100\", \"48000\", \"khz\"]",
+        "vgi.title": "Native Sample Rate (Hz)"
+      },
+      "INTEGER",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22601,
+      [
+        "SELECT audio.main.sample_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "sample_rate",
+      null,
+      "scalar",
+      "Native sample rate in Hz, from a BLOB of audio bytes (NULL if undecodable)",
+      null,
+      {
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.sample_rate\n\nReturn the recording's **native sample rate in Hz** (e.g. 44100, 48000) as an `INTEGER`. Accepts a `VARCHAR` path or a `BLOB` of audio bytes.\n\n**When to use.** Group or validate a collection by sample rate, detect downsampled material, or decide resampling before further processing.\n\n**Behavior.** Read straight from the container header when possible; for formats that can't be probed, a brief decode recovers the source rate. This is the recording's **native/original** rate -- note the feature scalars (tempo, spectral, mfcc, ...) internally resample to 22.05 kHz for analysis, so their results are independent of this value. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# sample_rate\n\nNative **sample rate in Hz** (`INTEGER`), e.g. `44100`.\n\n```sql\nSELECT audio.main.sample_rate('/music/track.wav');\n```\n\nThe recording's original rate, taken from the file header where available (the analysis features resample to 22.05 kHz regardless). Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Native sample rate (Hz) of an inline WAV tone.\", \"sql\": \"SELECT audio.main.sample_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"sample rate\", \"samplerate\", \"hz\", \"frequency\", \"sampling\", \"44100\", \"48000\", \"khz\"]",
+        "vgi.title": "Native Sample Rate (Hz)"
+      },
+      "INTEGER",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22601,
+      [
+        "SELECT audio.main.sample_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "metadata"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "spectral_bandwidth",
+      null,
+      "scalar",
+      "Mean spectral bandwidth in Hz, from a file path",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.spectral_bandwidth\n\nReturn the **mean spectral bandwidth in Hz** as a `DOUBLE` -- the energy-weighted spread (a p=2 standard deviation) of the spectrum around its centroid. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Separate narrow-band tonal sounds (small bandwidth) from broadband or noisy sounds (large bandwidth); a complementary timbre feature alongside `spectral_centroid`.\n\n**Behavior.** Computed per analysis frame and averaged over a bounded mono signal resampled to 22.05 kHz, so it is bounded by the ~11 kHz Nyquist limit. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# spectral_bandwidth\n\nMean **spectral bandwidth in Hz** (`DOUBLE`) -- spectral spread.\n\n```sql\nSELECT audio.main.spectral_bandwidth('/music/track.wav');\n```\n\nSmall = tonal/narrow-band; large = broadband/noisy. Bounded by the ~11 kHz Nyquist limit of the 22.05 kHz analysis. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean spectral bandwidth (Hz), a spectral-spread measure, of an inline WAV tone.\", \"sql\": \"SELECT audio.main.spectral_bandwidth(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"spectral bandwidth\", \"spread\", \"spectrum width\", \"timbre\", \"broadband\", \"narrowband\"]",
+        "vgi.title": "Mean Spectral Bandwidth (Hz)"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22602,
+      [
+        "SELECT audio.main.spectral_bandwidth(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "spectral_bandwidth",
+      null,
+      "scalar",
+      "Mean spectral bandwidth in Hz, from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.spectral_bandwidth\n\nReturn the **mean spectral bandwidth in Hz** as a `DOUBLE` -- the energy-weighted spread (a p=2 standard deviation) of the spectrum around its centroid. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Separate narrow-band tonal sounds (small bandwidth) from broadband or noisy sounds (large bandwidth); a complementary timbre feature alongside `spectral_centroid`.\n\n**Behavior.** Computed per analysis frame and averaged over a bounded mono signal resampled to 22.05 kHz, so it is bounded by the ~11 kHz Nyquist limit. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# spectral_bandwidth\n\nMean **spectral bandwidth in Hz** (`DOUBLE`) -- spectral spread.\n\n```sql\nSELECT audio.main.spectral_bandwidth('/music/track.wav');\n```\n\nSmall = tonal/narrow-band; large = broadband/noisy. Bounded by the ~11 kHz Nyquist limit of the 22.05 kHz analysis. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean spectral bandwidth (Hz), a spectral-spread measure, of an inline WAV tone.\", \"sql\": \"SELECT audio.main.spectral_bandwidth(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"spectral bandwidth\", \"spread\", \"spectrum width\", \"timbre\", \"broadband\", \"narrowband\"]",
+        "vgi.title": "Mean Spectral Bandwidth (Hz)"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22602,
+      [
+        "SELECT audio.main.spectral_bandwidth(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "spectral_centroid",
+      null,
+      "scalar",
+      "Mean spectral centroid in Hz (spectrum centre of mass), from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.spectral_centroid\n\nReturn the **mean spectral centroid in Hz** as a `DOUBLE` -- the amplitude-weighted center of mass of the magnitude spectrum, the standard measure of timbral brightness. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Quantify brightness to rank or cluster sounds (bright/sharp vs dark/dull), gate on tone colour, or feed a similarity model.\n\n**Behavior.** Computed per analysis frame and averaged over a bounded mono signal resampled to 22.05 kHz, so the value ranges from `0` up to the Nyquist limit of ~11 kHz; brighter sounds sit higher. It is energy-weighted, so near-silent frames contribute little. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# spectral_centroid\n\nMean **spectral centroid in Hz** (`DOUBLE`) -- spectral brightness.\n\n```sql\nSELECT audio.main.spectral_centroid('/music/track.wav');\n```\n\nHigher = brighter/sharper timbre. Analysis runs at 22.05 kHz, so values top out near the ~11 kHz Nyquist limit. Also accepts a `BLOB` of raw bytes. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean spectral centroid (Hz), a brightness measure, of an inline WAV tone.\", \"sql\": \"SELECT audio.main.spectral_centroid(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"spectral centroid\", \"brightness\", \"timbre\", \"center of mass\", \"spectrum\", \"sharpness\"]",
+        "vgi.title": "Mean Spectral Centroid (Hz)"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22603,
+      [
+        "SELECT audio.main.spectral_centroid(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "spectral_centroid",
+      null,
+      "scalar",
+      "Mean spectral centroid in Hz (spectrum centre of mass), from a file path",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.spectral_centroid\n\nReturn the **mean spectral centroid in Hz** as a `DOUBLE` -- the amplitude-weighted center of mass of the magnitude spectrum, the standard measure of timbral brightness. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Quantify brightness to rank or cluster sounds (bright/sharp vs dark/dull), gate on tone colour, or feed a similarity model.\n\n**Behavior.** Computed per analysis frame and averaged over a bounded mono signal resampled to 22.05 kHz, so the value ranges from `0` up to the Nyquist limit of ~11 kHz; brighter sounds sit higher. It is energy-weighted, so near-silent frames contribute little. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# spectral_centroid\n\nMean **spectral centroid in Hz** (`DOUBLE`) -- spectral brightness.\n\n```sql\nSELECT audio.main.spectral_centroid('/music/track.wav');\n```\n\nHigher = brighter/sharper timbre. Analysis runs at 22.05 kHz, so values top out near the ~11 kHz Nyquist limit. Also accepts a `BLOB` of raw bytes. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean spectral centroid (Hz), a brightness measure, of an inline WAV tone.\", \"sql\": \"SELECT audio.main.spectral_centroid(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"spectral centroid\", \"brightness\", \"timbre\", \"center of mass\", \"spectrum\", \"sharpness\"]",
+        "vgi.title": "Mean Spectral Centroid (Hz)"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22603,
+      [
+        "SELECT audio.main.spectral_centroid(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "tempo",
+      null,
+      "scalar",
+      "Estimated tempo in BPM (heuristic), from a file path",
+      null,
+      {
+        "vgi.category": "rhythm",
+        "vgi.doc_llm": "## audio.tempo\n\nEstimate the **tempo of a recording in beats per minute** as a `DOUBLE`, using librosa's onset/beat analysis. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Sort a music library by speed, find tracks within a BPM range for a playlist or DJ set, or cluster rhythmically similar audio.\n\n**Behavior.** This is a **heuristic estimate** -- it can land on a half/double-time multiple of the perceived tempo, and is unreliable on material with no steady pulse. Computed on a bounded mono signal at a fixed analysis rate. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# tempo\n\nEstimated **tempo in BPM** (`DOUBLE`).\n\n```sql\nSELECT audio.main.tempo('/music/track.mp3');   -- e.g. 120.0\n```\n\n> Heuristic: may report a half/double-time multiple, and is unreliable on audio without a steady beat. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Estimated tempo (BPM) of an inline WAV clip.\", \"sql\": \"SELECT audio.main.tempo(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"tempo\", \"bpm\", \"beats per minute\", \"speed\", \"pace\", \"rhythm\", \"beat\"]",
+        "vgi.title": "Estimated Tempo (BPM)"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22604,
+      [
+        "SELECT audio.main.tempo(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "rhythm"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "tempo",
+      null,
+      "scalar",
+      "Estimated tempo in BPM (heuristic), from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "rhythm",
+        "vgi.doc_llm": "## audio.tempo\n\nEstimate the **tempo of a recording in beats per minute** as a `DOUBLE`, using librosa's onset/beat analysis. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** Sort a music library by speed, find tracks within a BPM range for a playlist or DJ set, or cluster rhythmically similar audio.\n\n**Behavior.** This is a **heuristic estimate** -- it can land on a half/double-time multiple of the perceived tempo, and is unreliable on material with no steady pulse. Computed on a bounded mono signal at a fixed analysis rate. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# tempo\n\nEstimated **tempo in BPM** (`DOUBLE`).\n\n```sql\nSELECT audio.main.tempo('/music/track.mp3');   -- e.g. 120.0\n```\n\n> Heuristic: may report a half/double-time multiple, and is unreliable on audio without a steady beat. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Estimated tempo (BPM) of an inline WAV clip.\", \"sql\": \"SELECT audio.main.tempo(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"tempo\", \"bpm\", \"beats per minute\", \"speed\", \"pace\", \"rhythm\", \"beat\"]",
+        "vgi.title": "Estimated Tempo (BPM)"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22604,
+      [
+        "SELECT audio.main.tempo(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "rhythm"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "zero_crossing_rate",
+      null,
+      "scalar",
+      "Mean zero-crossing rate (fraction of sign changes), from a file path",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.zero_crossing_rate\n\nReturn the **mean zero-crossing rate** of the signal as a `DOUBLE` -- the average fraction of adjacent samples where the waveform changes sign. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** A cheap timbre/noisiness cue: percussive, noisy, or unvoiced content has a high ZCR; smooth tonal content a low one. Useful for rough speech-vs-music or voiced-vs-unvoiced splits.\n\n**Behavior.** Computed per analysis frame over a bounded mono signal and averaged; the value is a fraction in `0`..`1` (the share of sample pairs that cross zero). It tracks high-frequency/noise content but is not a pitch or frequency estimate. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# zero_crossing_rate\n\nMean **zero-crossing rate** (`DOUBLE`, `0`..`1`).\n\n```sql\nSELECT audio.main.zero_crossing_rate('/music/track.wav');\n```\n\nHigh for noisy/percussive audio, low for smooth tones; a fraction of sign changes, not a frequency. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean zero-crossing rate of an inline WAV tone.\", \"sql\": \"SELECT audio.main.zero_crossing_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"zero crossing rate\", \"zcr\", \"noisiness\", \"timbre\", \"sign changes\", \"percussive\", \"voiced\"]",
+        "vgi.title": "Mean Zero-Crossing Rate"
+      },
+      "DOUBLE",
+      [
+        "path"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22605,
+      [
+        "SELECT audio.main.zero_crossing_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ],
+    [
+      "audio",
+      "22592",
+      "main",
+      "zero_crossing_rate",
+      null,
+      "scalar",
+      "Mean zero-crossing rate (fraction of sign changes), from a BLOB of audio bytes",
+      null,
+      {
+        "vgi.category": "spectral",
+        "vgi.doc_llm": "## audio.zero_crossing_rate\n\nReturn the **mean zero-crossing rate** of the signal as a `DOUBLE` -- the average fraction of adjacent samples where the waveform changes sign. Accepts a `VARCHAR` path or a `BLOB` of bytes.\n\n**When to use.** A cheap timbre/noisiness cue: percussive, noisy, or unvoiced content has a high ZCR; smooth tonal content a low one. Useful for rough speech-vs-music or voiced-vs-unvoiced splits.\n\n**Behavior.** Computed per analysis frame over a bounded mono signal and averaged; the value is a fraction in `0`..`1` (the share of sample pairs that cross zero). It tracks high-frequency/noise content but is not a pitch or frequency estimate. `NULL` on `NULL` or undecodable input.",
+        "vgi.doc_md": "# zero_crossing_rate\n\nMean **zero-crossing rate** (`DOUBLE`, `0`..`1`).\n\n```sql\nSELECT audio.main.zero_crossing_rate('/music/track.wav');\n```\n\nHigh for noisy/percussive audio, low for smooth tones; a fraction of sign changes, not a frequency. Also accepts a `BLOB`. `NULL` for undecodable input.",
+        "vgi.example_queries": "[{\"description\": \"Mean zero-crossing rate of an inline WAV tone.\", \"sql\": \"SELECT audio.main.zero_crossing_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))\"}]",
+        "vgi.keywords": "[\"zero crossing rate\", \"zcr\", \"noisiness\", \"timbre\", \"sign changes\", \"percussive\", \"voiced\"]",
+        "vgi.title": "Mean Zero-Crossing Rate"
+      },
+      "DOUBLE",
+      [
+        "blob"
+      ],
+      [
+        "BLOB"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22605,
+      [
+        "SELECT audio.main.zero_crossing_rate(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg=='))"
+      ],
+      "CONSISTENT",
+      [
+        "audio",
+        "spectral"
+      ]
+    ]
+  ]
+}

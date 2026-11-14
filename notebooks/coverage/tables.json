@@ -1,0 +1,50 @@
+{
+  "query": "SELECT * FROM duckdb_tables() WHERE database_name='audio'",
+  "captured_at": "2026-11-14T21:52:45.210607+00:00",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "schema_oid",
+    "table_name",
+    "table_oid",
+    "comment",
+    "tags",
+    "internal",
+    "temporary",
+    "has_primary_key",
+    "estimated_size",
+    "column_count",
+    "index_count",
+    "check_constraint_count",
+    "sql"
+  ],
+  "rows": [
+    [
+      "audio",
+      22592,
+      "main",
+      22593,
+      "example_clips",
+      22739,
+      "Built-in example audio clips (name, core metadata, raw bytes) for trying the feature functions.",
+      {
+        "domain": "audio",
+        "vgi.category": "metadata",
+        "vgi.doc_llm": "## audio.example_clips\n\nA **browsable table** (no arguments) listing the worker's built-in example audio clips, one row each: `name`, a one-line `description`, the decoded `duration`/`sample_rate`/`channels`, the detected `beat_count`, and the raw `audio` `BLOB`.\n\n**When to use.** Start here to see real sample data and to grab a ready-made audio blob: select the `audio` column for a clip and pass it directly to any feature function (`duration`, `tempo`, `mfcc`, `beats`, `audio_info`, ...) without needing a file on disk. The `tone` clip is a steady sine (good for the metadata/spectral scalars); the `click` clip has a clear 120 BPM pulse (good for `tempo` and `beats`).",
+        "vgi.doc_md": "# example_clips\n\nA browsable discovery table of the worker's built-in example audio clips.\n\n| column | type | description |\n|---|---|---|\n| `name` | VARCHAR | Short clip identifier (`tone`, `click`). |\n| `description` | VARCHAR | What the clip is. |\n| `duration` | DOUBLE | Duration in seconds. |\n| `sample_rate` | INTEGER | Native sample rate in Hz. |\n| `channels` | INTEGER | Number of audio channels. |\n| `beat_count` | INTEGER | Number of beats librosa detects in the clip. |\n| `audio` | BLOB | Raw WAV bytes to feed any feature function. |\n\nSelect the `audio` column of a row and pass it straight into a scalar or table function to try the worker with no file on disk.",
+        "vgi.example_queries": "[{\"description\": \"List the built-in example clips with their core metadata.\", \"sql\": \"SELECT name, description, duration, sample_rate, channels FROM audio.main.example_clips ORDER BY name\"}, {\"description\": \"Estimate the tempo of the built-in click track by feeding its bytes to tempo().\", \"sql\": \"SELECT audio.main.tempo(audio) AS bpm FROM audio.main.example_clips WHERE name = 'click'\"}]",
+        "vgi.keywords": "[\"example\", \"sample\", \"demo\", \"clip\", \"tone\", \"click\", \"test audio\", \"discovery\", \"blob\"]",
+        "vgi.title": "Built-in Example Audio Clips"
+      },
+      false,
+      false,
+      true,
+      0,
+      7,
+      1,
+      0,
+      "CREATE TABLE example_clips(\"name\" VARCHAR, description VARCHAR NOT NULL, duration DOUBLE NOT NULL, sample_rate INTEGER NOT NULL, channels INTEGER NOT NULL, beat_count INTEGER NOT NULL, audio BLOB NOT NULL, PRIMARY KEY(\"name\"));"
+    ]
+  ]
+}

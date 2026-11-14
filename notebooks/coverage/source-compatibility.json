@@ -1,0 +1,16 @@
+{
+  "release": "v0.4.0",
+  "release_commit": "6b1327f4fe9232262060bbe4c3219ad6a5048fd8",
+  "current_revision": "83d5252f418b4c9a9bc9112599236ab1f399cf3f",
+  "root_dependencies_unchanged": true,
+  "feature_logic_unchanged": true,
+  "source_review": "Current source adds composed examples and clarifies metadata/docs: table arguments require literals, built-in bytes include WAV or FLAC. Feature logic and root dependencies are unchanged. Full actual argument and output signatures match; current-compatible coverage does not claim a current-main notebook execution.",
+  "source_ci": {
+    "url": "https://github.com/Query-farm/vgi-audio/actions/runs/43558931194",
+    "revision": "83d5252f418b4c9a9bc9112599236ab1f399cf3f",
+    "conclusion": "success"
+  },
+  "runtime": "Haybarn2.0.0rc11",
+  "launch": "uvx --python 3.13 --from git+https://github.com/Query-farm/vgi-audio@v0.4.0 vgi-audio-worker",
+  "runtime_review": "Release-owned dependencies launch without older notebook overrides. Actual complete current catalog collected through immutable public Git revision; no source build or test-suite repetition."
+}

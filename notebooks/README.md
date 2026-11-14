@@ -1,98 +1,127 @@
-# Audio worker notebooks
+# Audio Feature Extraction examples
 
-[01 · Louder or brighter?](01_louder_or_brighter.ipynb) separates digital RMS level
-from spectral balance. A reference tone, an attenuated copy, and a normalized
-two-tone mix are measured by the real worker. SQL compares their relative dB and
-spectral centroids, then tests a harmonic sweep against an approximate model.
-The notebook contains successful outputs and two figures.
+| Notebook | Question | One-parameter experiment |
+|---|---|---|
+| [01 · Louder or brighter?](01_louder_or_brighter.ipynb) | Can equal designed RMS coexist with different spectral balance? | Harmonic amplitude ratio 0.5 → 1.0 |
+| [02 · A tempo estimate is not a detected beat list](02_a_tempo_estimate_is_not_a_beat_list.ipynb) | How do a whole-clip tempo and a rate calculated from selected event gaps differ? | Excluded window endpoint 2.0 → 1.25 seconds |
 
-## Install and run
-
-Install [uv](https://docs.astral.sh/uv/) and Git. This directory can be copied
-away from the worker checkout; no root environment or local worker build is used.
-From this directory:
+Each notebook has an **Open in Colab** link. Choose **Runtime → Run all**. Its
+short bootstrap installs only the shared base package and retrieves an immutable,
+SHA256-verified helper. For local execution install [uv](https://docs.astral.sh/uv/)
+and Git, then run from `notebooks/`:
 
 ```sh
 uv sync --locked
-uv run --locked python execute.py --timeout 300
+uv run --locked vgi-notebooks
+uv run --locked vgi-notebooks 01_louder_or_brighter.ipynb --parameters '{"HARMONIC_RATIO":1.0}' --output-dir artifacts/equal-harmonics
+uv run --locked vgi-notebooks 02_a_tempo_estimate_is_not_a_beat_list.ipynb --parameters '{"WINDOW_END_S":1.25}' --output-dir artifacts/shorter-window
 ```
 
-Haybarn **2.0.0rc11**, JupySQL, plotting tools and the execution environment are
-locked separately here. The visible literal ATTACH launches Python 3.13 through
-uvx and the remotely available **v0.4.0** Git tag. Its command pins
-**vgi-python 0.51.0**, **vgi-rpc 0.53.1**, **librosa 1.0.0**, **soundfile 0.14.0**,
-and **NumPy 2.5.4**. Initial extension/package/Python downloads require internet.
-The worker warms librosa/Numba at startup; a cold cache can take tens of seconds.
-The generated PCM WAVs do not need ffmpeg.
+For Jupyter select `.venv/bin/python`. The locked `[runner]` extra is local tooling;
+Colab installs the base package only. Overrides require a separate destination,
+unknown parameters fail and failed execution cannot replace a successful default.
+If an older setup replaced kernel libraries, open this version in a fresh runtime.
 
-The runner uses an isolated temporary kernel with the current interpreter and
-notebook-directory cwd. It atomically saves only successful executions. Parameter
-overrides require a separate destination. For an existing Jupyter frontend:
+## Portable release and shared presentation
 
-```sh
-uv run --locked python -m ipykernel install --user \
-  --name vgi-audio-notebooks --display-name "Python (vgi-audio notebooks)"
+```sql
+INSTALL vgi FROM community;
+LOAD vgi;
+ATTACH 'audio' (TYPE vgi,
+  LOCATION 'uvx --python 3.13 --from git+https://github.com/Query-farm/vgi-audio@v0.4.0 vgi-audio-worker');
 ```
 
-Select that kernel, then **Restart Kernel → Run All** after editing parameters.
-Run the frontend from this directory. The runner does not register a global kernel.
+The actual public v0.4.0 tag owns its worker dependencies. This short launch was
+verified through Haybarn 2.0.0rc11 without older notebook transitive overrides. It
+resolved vgi-python 0.51.1, vgi-rpc 0.53.1, PyArrow 26.0.1, librosa 1.0.1,
+soundfile 0.14.0, NumPy 2.5.4 and Numba 0.68.1 in a separate Python 3.13 worker
+environment. The notebook lock does not lock that worker environment.
 
-## One-parameter experiment
+Initial Git/package/extension/helper retrieval needs internet and compatible
+numerical/audio wheels. Cold librosa/Numba warm-up can take tens of seconds.
+No local worker checkout, root environment, credentials, external audio service
+or recording download is required. The WAV/FLAC inputs need no ffmpeg. macOS arm64
+was tested; other platforms were not executed. Shared connection setup isolates
+persistent SQL secrets.
 
-```sh
-uv run --locked python execute.py --timeout 300 \
-  --parameters '{"HARMONIC_RATIO": 1.0}' --output-dir artifacts/equal-harmonics
-```
+The [shared v0.3.25 standard](https://github.com/Query-farm/vgi-example-notebooks/blob/v0.3.25/docs/standard.md)
+provides the catalog-derived title/subtitle, branding, isolated SQL connection,
+SVG presentation and protected runner. Keep `charts/` beside saved notebooks for
+GitHub image links; interactive runs retain native SVG. Generated audio, review
+PNGs, logs and experiment copies remain ignored. Hosted Colab was not manually
+operated; one fresh compatible kernel preloads eight libraries before executing
+the second notebook’s visible bootstrap. Both books use the same helper/launch path.
 
-The default ratio is **0.5**, and the accepted range is **0–1**. Predict a higher
-spectral centroid near 880 Hz at equal component amplitudes, while the mix's RMS
-level stays near 0 dB relative to the reference. Compare the first figure's two
-panels and the sweep endpoint. The half-amplitude control should still measure
-about −6.02 dB. Reset the ratio to **0.5** for the saved default.
+## Coverage and current source
 
-Experiment copies include their branding assets, guide, helper, runner and lock.
-Generated inputs, extracted charts, experiments and validation logs live under
-ignored `artifacts/`; they are regenerated without another repository.
+Complete actual catalogs contain **13 public named surfaces**: ten scalar functions,
+two table functions and the `example_clips` table. Path/BLOB and MFCC arity
+overloads count once; all 26 function rows and full table schemas are retained.
+The two focused stories meaningfully cover **9/13**, exceeding the required seven:
+`duration`, `sample_rate`, `channels`, `rms_energy`, `spectral_centroid`,
+`example_clips`, `audio_info`, `tempo` and `beats`.
 
-## Signal design and limits
+`zero_crossing_rate`, `spectral_bandwidth`, `mfcc` and `estimated_key` remain
+uncovered. Catalog exports, reviewed mappings and hashed execution receipts live
+in `coverage.json` and `coverage/`. The notebook runtime is v0.4.0, source
+`6b1327f4fe9232262060bbe4c3219ad6a5048fd8`. Current public source
+`83d5252f418b4c9a9bc9112599236ab1f399cf3f` has identical interfaces, unchanged
+feature logic and unchanged root dependencies; differences add composed examples
+and clarify literal arguments and WAV/FLAC metadata. Compatible current coverage
+does not claim a separately executed current-main notebook.
 
-All inputs are synthetic three-second, 22,050 Hz, mono, signed 32-bit PCM WAVs.
-`notebook_support.py` generates them with NumPy and Python's standard `wave`
-module; it imports no audio analysis library. The reference is a 440 Hz sine of
-peak amplitude 0.4. A copy uses half that amplitude. The harmonic mix is
+Existing green [source CI](https://github.com/Query-farm/vgi-audio/actions/runs/43558931194)
+is reused. This update changes only notebooks; no worker rebuild, repeated full
+suite, container publication or new worker release is needed. The original
+checkout’s modified root README and older source state are preserved.
 
-```text
-0.4 / sqrt(1 + r²) × (sin(2π × 440 × t) + r × sin(2π × 1320 × t))
-```
+## Controlled level and brightness
 
-Five additional clips span `r = 0` through the chosen ratio. Distinct components
-complete integer cycle counts over the clip, so the cross term averages to zero;
-the mix's designed whole-clip RMS is 0.4/√2. The peak stays below full scale for
-the accepted ratios. SQL reads WAV bytes into BLOBs and sends them through VGI.
-Every measured duration, channel count, sample rate, RMS and centroid comes from
-the remote worker. Materialized SQL tables supply the charts.
+The first notebook authors three-second mono 22,050-Hz PCM-32 WAV signals. A 440-Hz
+reference, half-amplitude copy and normalized 440/1320-Hz mixture form the main
+comparison. Five additional clips sweep the harmonic ratio. Python defines inputs;
+the actual worker supplies measured features and SQL computes comparisons.
 
-The worker averages RMS and spectral centroid over frames at 22.05 kHz mono.
-Boundary padding, window leakage and finite precision mean those results need
-not exactly equal whole-clip RMS or an ideal two-line spectrum. SQL uses stated
-tolerances. RMS is digital amplitude, not calibrated sound pressure or perceived
-loudness; a centroid is not pitch or a complete description of timbre. No playback
-is needed. Invalid bytes return NULL and stay distinct from a measured zero.
+Halving amplitude should change relative RMS by approximately −6.02 dB while
+preserving spectral centroid. Normalization keeps designed whole-clip RMS fixed
+as the harmonic ratio changes. The worker averages framed RMS/centroid values, so
+window padding and spectral leakage cause small deviations from ideal formulas.
+The comparison is an uncalibrated digital level ratio, not dB SPL, perceived
+loudness, a mastering standard or listening quality. Centroid is neither pitch nor
+a complete timbre description. Invalid bytes remain unavailable rather than zero.
 
-The v0.4.0 release supplies wheel/source assets, so the example uses a pinned Git
-launch instead of assuming a native release binary exists. To upgrade, change the
-literal release/dependency pins, rerun both parameter sets, and inspect the figures
-and SQL checks before replacing saved outputs. `INSTALL vgi FROM community`
-downloads the community extension independently of this Python lock.
+The ratio experiment changes 0.5 to 1.0 while retaining the reference and
+half-amplitude controls. Eight SQL checks use explicit tolerances for these
+controlled signals. They do not claim a universal audio identity.
 
-The unchanged local Strata Sun and VGI assets link to Query.Farm and VGI.
+## Tempo, event lists and a half-open window
 
-## Validation
+The second notebook reads the actual built-in sample table once: a 2-second,
+6,000-Hz mono FLAC click clip and a 0.5-second, 200-Hz mono WAV tone. Their byte
+strings are synthetic embedded fixtures, not external recordings. The table’s
+`beat_count` is itself calculated by the worker’s detector, so its agreement with
+`beats()` is consistency, not independent ground truth.
 
-The source gates pass: 55 pytest tests; 61/69/61 SQL assertions over
-stdio/HTTP/Unix sockets; Ruff, mypy (nine files), and CI-prescribed isolated
-`uvx pydoclint`. Current vgi-lint 2.5.1 against a warmed persistent HTTP worker reports
-100/100, L2 behavioral assurance, and zero findings. Its bare stdio runs hit
-10/30-second probe/example timeouts while repeatedly starting workers; those
-timeouts are recorded separately and are not counted as passing metadata checks. The notebook's default and experiment checks are separate
-executions against its pinned remote worker launch.
+Scalar functions accept columns of bytes. The table functions require literal
+arguments and reject lateral column/subquery inputs. The notebook copies the two
+catalog byte strings unchanged into generated `.bin` files, verifies SQL SHA256,
+and passes visible literal paths to `audio_info` and `beats`. Their real headers
+determine decoding. This is input materialization, never a substitute fixture or
+feature calculation. Invalid non-NULL bytes emit no table rows; SQL NULL arguments
+are rejected at binding and are not used.
+
+Native metadata differs from analysis rate: features resample to 22,050 Hz mono.
+Beat `seq` is a zero-based output index; `time` is seconds from clip start. The
+click list has events near 0.534, 1.045 and 1.533 seconds. The steady tone has no
+detected events but a numeric tempo estimate near 136 BPM. That output is not
+evidence of a reliable musical pulse. Invalid bytes retain unavailable metadata
+and estimates, separately from a valid zero-event clip.
+
+Selection uses **[0, WINDOW_END_S)** over the complete materialized event list.
+Changing 2.0 to 1.25 seconds retains two of three click events and one rather than
+two gaps. The resulting `60 / median(gap)` rate changes from about 120.19 to
+117.45 BPM, while the whole-clip tempo remains about 117.45 BPM. No audio is cropped
+or reanalyzed for the parameter change. One or two intervals cannot establish
+tempo accuracy or confidence, and numerical agreement between estimators does not
+validate either. Eleven SQL checks verify bytes, metadata, population, bounds and
+interval arithmetic while retaining the zero-event tone and invalid input.

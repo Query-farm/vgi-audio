@@ -1,0 +1,38 @@
+{
+  "query": "DESCRIBE SELECT * FROM audio.main.audio_info(''::BLOB)",
+  "captured_at": "2026-11-14T22:00:36.926502+00:00",
+  "columns": [
+    "column_name",
+    "column_type",
+    "null",
+    "key",
+    "default",
+    "extra"
+  ],
+  "rows": [
+    [
+      "duration",
+      "DOUBLE",
+      "YES",
+      null,
+      null,
+      null
+    ],
+    [
+      "sample_rate",
+      "INTEGER",
+      "YES",
+      null,
+      null,
+      null
+    ],
+    [
+      "channels",
+      "INTEGER",
+      "YES",
+      null,
+      null,
+      null
+    ]
+  ]
+}

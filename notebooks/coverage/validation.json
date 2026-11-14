@@ -1,0 +1,879 @@
+{
+  "schema_version": 1,
+  "status": "met",
+  "meets_target": true,
+  "catalogs": {
+    "released": {
+      "catalog_status": "verified",
+      "revision": "v0.4.0",
+      "catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+      "collection_reconciled": true,
+      "denominator": 13,
+      "observed_objects": 13,
+      "required": 7,
+      "verified_count": 9,
+      "candidate_count": 0,
+      "fraction": 0.6923076923076923,
+      "meets_target": true,
+      "exact_runtime_count": 9,
+      "runtime_revisions": [
+        "v0.4.0"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "audio_info"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "beats"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "channels"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "duration"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "example_clips"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "rms_energy"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "sample_rate"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_centroid"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "tempo"
+        }
+      ],
+      "uncovered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "estimated_key"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "mfcc"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_bandwidth"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "zero_crossing_rate"
+        }
+      ],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "audio_info",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "audio_info(blob BLOB) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)",
+            "audio_info(path VARCHAR) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "beats",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "beats(blob BLOB) -> TABLE(seq BIGINT, time DOUBLE)",
+            "beats(path VARCHAR) -> TABLE(seq BIGINT, time DOUBLE)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "channels",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "channels(blob BLOB) -> INTEGER",
+            "channels(path VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "duration",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "duration(blob BLOB) -> DOUBLE",
+            "duration(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "estimated_key",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "estimated_key(blob BLOB) -> VARCHAR",
+            "estimated_key(path VARCHAR) -> VARCHAR"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "example_clips",
+          "kinds": [
+            "table"
+          ],
+          "signatures": [
+            "TABLE(name VARCHAR, description VARCHAR, duration DOUBLE, sample_rate INTEGER, channels INTEGER, beat_count INTEGER, audio BLOB)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "mfcc",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "mfcc(blob BLOB) -> DOUBLE[]",
+            "mfcc(blob BLOB, n BIGINT) -> DOUBLE[]",
+            "mfcc(path VARCHAR) -> DOUBLE[]",
+            "mfcc(path VARCHAR, n BIGINT) -> DOUBLE[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "rms_energy",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "rms_energy(blob BLOB) -> DOUBLE",
+            "rms_energy(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "sample_rate",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "sample_rate(blob BLOB) -> INTEGER",
+            "sample_rate(path VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_bandwidth",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "spectral_bandwidth(blob BLOB) -> DOUBLE",
+            "spectral_bandwidth(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_centroid",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "spectral_centroid(blob BLOB) -> DOUBLE",
+            "spectral_centroid(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "tempo",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "tempo(blob BLOB) -> DOUBLE",
+            "tempo(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "zero_crossing_rate",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "zero_crossing_rate(blob BLOB) -> DOUBLE",
+            "zero_crossing_rate(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    },
+    "current": {
+      "catalog_status": "verified",
+      "revision": "83d5252f418b4c9a9bc9112599236ab1f399cf3f",
+      "catalog_sha256": "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb",
+      "collection_reconciled": true,
+      "denominator": 13,
+      "observed_objects": 13,
+      "required": 7,
+      "verified_count": 9,
+      "candidate_count": 0,
+      "fraction": 0.6923076923076923,
+      "meets_target": true,
+      "exact_runtime_count": 0,
+      "runtime_revisions": [
+        "v0.4.0"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "audio_info"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "beats"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "channels"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "duration"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "example_clips"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "rms_energy"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "sample_rate"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_centroid"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "tempo"
+        }
+      ],
+      "uncovered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "estimated_key"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "mfcc"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_bandwidth"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "zero_crossing_rate"
+        }
+      ],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "audio_info",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "audio_info(blob BLOB) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)",
+            "audio_info(path VARCHAR) -> TABLE(duration DOUBLE, sample_rate INTEGER, channels INTEGER)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "beats",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "beats(blob BLOB) -> TABLE(seq BIGINT, time DOUBLE)",
+            "beats(path VARCHAR) -> TABLE(seq BIGINT, time DOUBLE)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "channels",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "channels(blob BLOB) -> INTEGER",
+            "channels(path VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "duration",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "duration(blob BLOB) -> DOUBLE",
+            "duration(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "estimated_key",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "estimated_key(blob BLOB) -> VARCHAR",
+            "estimated_key(path VARCHAR) -> VARCHAR"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "example_clips",
+          "kinds": [
+            "table"
+          ],
+          "signatures": [
+            "TABLE(name VARCHAR, description VARCHAR, duration DOUBLE, sample_rate INTEGER, channels INTEGER, beat_count INTEGER, audio BLOB)"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "mfcc",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "mfcc(blob BLOB) -> DOUBLE[]",
+            "mfcc(blob BLOB, n BIGINT) -> DOUBLE[]",
+            "mfcc(path VARCHAR) -> DOUBLE[]",
+            "mfcc(path VARCHAR, n BIGINT) -> DOUBLE[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "rms_energy",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "rms_energy(blob BLOB) -> DOUBLE",
+            "rms_energy(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "sample_rate",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "sample_rate(blob BLOB) -> INTEGER",
+            "sample_rate(path VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_bandwidth",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "spectral_bandwidth(blob BLOB) -> DOUBLE",
+            "spectral_bandwidth(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "spectral_centroid",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "spectral_centroid(blob BLOB) -> DOUBLE",
+            "spectral_centroid(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "tempo",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "tempo(blob BLOB) -> DOUBLE",
+            "tempo(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "zero_crossing_rate",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "zero_crossing_rate(blob BLOB) -> DOUBLE",
+            "zero_crossing_rate(path VARCHAR) -> DOUBLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    }
+  },
+  "interface_drift": {
+    "known": true,
+    "current_only": [],
+    "released_only": [],
+    "changed": []
+  },
+  "notebooks": {
+    "01_louder_or_brighter.ipynb": {
+      "verified": true,
+      "issues": []
+    },
+    "02_a_tempo_estimate_is_not_a_beat_list.ipynb": {
+      "verified": true,
+      "issues": []
+    }
+  },
+  "examples": [
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "duration"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "sample_rate"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "channels"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "rms_energy"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "spectral_centroid"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "example_clips"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "audio_info"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "tempo"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "beats"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba"
+    }
+  ],
+  "issues": []
+}

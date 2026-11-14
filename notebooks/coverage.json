@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "catalogs": {
+    "released": {
+      "path": "coverage/catalog-released.json",
+      "sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "catalog_sha256": "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+        "notes": "Complete actual catalog: 26 overloads form 12 function names plus example_clips table=13. Full arguments and table columns retained; ten scalars, two table functions and one table. Current interfaces and feature logic match release; source changes add examples/clarify docs. Current-main notebooks not separately executed."
+      }
+    },
+    "current": {
+      "path": "coverage/catalog-current.json",
+      "sha256": "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "catalog_sha256": "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb",
+        "notes": "Complete actual catalog: 26 overloads form 12 function names plus example_clips table=13. Full arguments and table columns retained; ten scalars, two table functions and one table. Current interfaces and feature logic match release; source changes add examples/clarify docs. Current-main notebooks not separately executed."
+      }
+    }
+  },
+  "notebooks": [
+    {
+      "path": "01_louder_or_brighter.ipynb",
+      "sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+      "execution": {
+        "path": "coverage/run-01.json",
+        "sha256": "2537348b57d87a1a9e2bf656125d1b1a916e3a238d6164086a1aec569f787f87"
+      }
+    },
+    {
+      "path": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "sha256": "61ef91e15ea7e1ba58974bc0651b3ed8241ac162e2777b1322eadaf03a11332b",
+      "execution": {
+        "path": "coverage/run-02.json",
+        "sha256": "9e7965fa38bec133902ada30251cefd712d3132cb3f0f15320ac8cef3109b498"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "object": {
+        "schema": "main",
+        "name": "duration"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "sql": [
+        {
+          "cell": "measurement-query",
+          "reference": "audio.main.duration"
+        }
+      ],
+      "narrative_cells": [
+        "question",
+        "source-story",
+        "checks-story"
+      ],
+      "result_cells": [
+        "measurement-query",
+        "availability-finding",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "availability-finding",
+        "checks-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Confirm the controlled input format and duration before interpreting measured feature differences.",
+        "finding": "All eight generated signals return three-second duration; malformed input stays NULL. The native-format SQL relationship and retained unavailable row are explicitly checked."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "sample_rate"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "sql": [
+        {
+          "cell": "measurement-query",
+          "reference": "audio.main.sample_rate"
+        }
+      ],
+      "narrative_cells": [
+        "question",
+        "source-story",
+        "checks-story"
+      ],
+      "result_cells": [
+        "measurement-query",
+        "availability-finding",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "availability-finding",
+        "checks-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Confirm the controlled input format and duration before interpreting measured feature differences.",
+        "finding": "All eight generated PCM signals report their native 22,050-Hz sample rate; this agrees with their design rather than silently assuming feature-analysis rate. The native-format SQL relationship and retained unavailable row are explicitly checked."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "channels"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "sql": [
+        {
+          "cell": "measurement-query",
+          "reference": "audio.main.channels"
+        }
+      ],
+      "narrative_cells": [
+        "question",
+        "source-story",
+        "checks-story"
+      ],
+      "result_cells": [
+        "measurement-query",
+        "availability-finding",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "availability-finding",
+        "checks-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Confirm the controlled input format and duration before interpreting measured feature differences.",
+        "finding": "All eight generated signals return one native channel, confirming the mono design before comparing level and spectral measurements. The native-format SQL relationship and retained unavailable row are explicitly checked."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "rms_energy"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "sql": [
+        {
+          "cell": "measurement-query",
+          "reference": "audio.main.rms_energy"
+        }
+      ],
+      "narrative_cells": [
+        "comparison-story",
+        "sweep-story",
+        "experiment-story"
+      ],
+      "result_cells": [
+        "comparison-finding",
+        "comparison-chart",
+        "sweep-chart",
+        "sweep-finding",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "comparison-finding",
+        "sweep-finding",
+        "experiment-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Separate digital level from harmonic balance with amplitude and constant-designed-RMS controls.",
+        "finding": "Halving amplitude changes relative RMS by about -6.02dB; normalized harmonic mixes remain near0dB while centroid shifts. Framed measurements need not equal ideal whole-clip RMS, and results are not calibrated loudness or dBSPL."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "spectral_centroid"
+      },
+      "notebook": "01_louder_or_brighter.ipynb",
+      "sql": [
+        {
+          "cell": "measurement-query",
+          "reference": "audio.main.spectral_centroid"
+        }
+      ],
+      "narrative_cells": [
+        "comparison-story",
+        "sweep-story",
+        "experiment-story"
+      ],
+      "result_cells": [
+        "comparison-finding",
+        "comparison-chart",
+        "sweep-chart",
+        "sweep-finding",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "comparison-finding",
+        "sweep-finding",
+        "experiment-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "32440c790c67b54a2b8b28cce894c95b7a7f9e036bd584485d0b6cbeb371cac3",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Compare measured spectral balance with an approximate two-tone model while holding designed RMS fixed.",
+        "finding": "Changing harmonic ratio0.5\u21921 shifts centroid upward while level remains near the reference; measured-model residuals are quantified. Gain alone preserves centroid within tolerance. Centroid is not pitch or a complete perceptual-timbre model."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "example_clips"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "sql": [
+        {
+          "cell": "source-query",
+          "reference": "audio.main.example_clips"
+        }
+      ],
+      "narrative_cells": [
+        "source-story",
+        "extract-story"
+      ],
+      "result_cells": [
+        "source-query",
+        "population-finding",
+        "event-chart",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "population-finding",
+        "source-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "61ef91e15ea7e1ba58974bc0651b3ed8241ac162e2777b1322eadaf03a11332b",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Use actual embedded audio as hashed inputs and retain its metadata before comparing detector outputs.",
+        "finding": "Two real built-in synthetic byte strings are materialized once, copied unchanged and SHA256-verified for literal-path table calls. Catalog beat_count uses the same detector, so reconciliation is not independent accuracy evidence. Invalid authored bytes stay distinct."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "audio_info"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "sql": [
+        {
+          "cell": "extract-query",
+          "reference": "audio.main.audio_info"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "checks-story"
+      ],
+      "result_cells": [
+        "accounting-query",
+        "population-finding",
+        "event-chart",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "population-finding",
+        "extract-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "61ef91e15ea7e1ba58974bc0651b3ed8241ac162e2777b1322eadaf03a11332b",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Preserve native clip extents and decode availability separately from zero detected events.",
+        "finding": "Click metadata reports2s/6000Hz/mono and tone0.5s/200Hz/mono. Invalid bytes return no metadata row, retained via left join. Native rates are distinct from fixed22050Hz mono feature analysis; valid zero-event tone is not a decode failure."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "tempo"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "sql": [
+        {
+          "cell": "source-query",
+          "reference": "audio.main.tempo"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "rate-story",
+        "experiment-story"
+      ],
+      "result_cells": [
+        "population-finding",
+        "rate-chart",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "population-finding",
+        "rate-chart"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "61ef91e15ea7e1ba58974bc0651b3ed8241ac162e2777b1322eadaf03a11332b",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Interpret whole-clip tempo beside detected event lists and a window-dependent interval calculation.",
+        "finding": "Click tempo is about117.45BPM and steady tone about136BPM despite zero tone beat events. Whole-clip estimates remain fixed when the reporting endpoint changes; a numeric tempo is not a confidence score or evidence of a reliable pulse."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "beats"
+      },
+      "notebook": "02_a_tempo_estimate_is_not_a_beat_list.ipynb",
+      "sql": [
+        {
+          "cell": "extract-query",
+          "reference": "audio.main.beats"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "accounting-story",
+        "rate-story",
+        "experiment-story"
+      ],
+      "result_cells": [
+        "extract-query",
+        "population-finding",
+        "event-chart",
+        "rate-chart",
+        "checks-finding"
+      ],
+      "interpretation_cells": [
+        "population-finding",
+        "rate-chart",
+        "experiment-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_earthquakes",
+        "reviewed_at": "2026-11-14T22:09:21.202180+00:00",
+        "notebook_sha256": "61ef91e15ea7e1ba58974bc0651b3ed8241ac162e2777b1322eadaf03a11332b",
+        "catalog_sha256": [
+          "81abf694b19f6de73a1657659a88b3ea314d6d3071dc9a64d23a7ef30be98bba",
+          "91c1b603820eb40089b37f722b03981749cfe8d9b2efeddb2e48f4c68b1095bb"
+        ],
+        "purpose": "Audit full event times, half-open local selection and interval-based rate without recropping audio.",
+        "finding": "The full click list has three events near0.534/1.045/1.533s; endpoint2\u21921.25 retains3\u21922 and2\u21921 gaps. Grid rate120.19\u2192117.45BPM changes while whole-clip tempo stays fixed. Valid zero-event tone and undecodable input remain visible with different availability semantics."
+      }
+    }
+  ]
+}

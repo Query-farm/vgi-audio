@@ -1,0 +1,30 @@
+{
+  "query": "DESCRIBE SELECT * FROM audio.main.beats(''::BLOB)",
+  "captured_at": "2026-11-14T21:53:33.926250+00:00",
+  "columns": [
+    "column_name",
+    "column_type",
+    "null",
+    "key",
+    "default",
+    "extra"
+  ],
+  "rows": [
+    [
+      "seq",
+      "BIGINT",
+      "YES",
+      null,
+      null,
+      null
+    ],
+    [
+      "time",
+      "DOUBLE",
+      "YES",
+      null,
+      null,
+      null
+    ]
+  ]
+}
