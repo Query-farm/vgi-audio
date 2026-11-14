@@ -179,6 +179,11 @@ fixtures under `test/sql/data/` drive the SQL E2E.
 
 ---
 
+## Notebooks
+
+[Executed SQL walkthrough: louder or brighter?](notebooks/README.md) compares
+synthetic tones through the real worker, with a separate harmonic-balance experiment.
+
 ## Authorship & License
 
 Written by [Query.Farm](https://query.farm).

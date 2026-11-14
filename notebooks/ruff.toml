@@ -1,0 +1,8 @@
+line-length = 120
+target-version = "py313"
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "D"]
+[lint.pydocstyle]
+convention = "google"
+[lint.per-file-ignores]
+"*.ipynb" = ["E402", "F821", "D"]
