@@ -37,7 +37,7 @@ from vgi.arguments import ConstParam, Param, Returns
 from vgi.metadata import FunctionExample
 from vgi.scalar_function import ScalarFunction
 
-from . import features, meta
+from . import composed, features, meta
 from ._example_audio import TONE_WAV_B64
 from .features import AudioInput
 
@@ -421,7 +421,14 @@ _TAGS_MFCC = meta.object_tags(
     example_queries=[
         ("Default 13 MFCC coefficient means of an inline WAV tone.", f"SELECT audio.main.mfcc({_TONE_BLOB_SQL})"),
         ("Keep 20 MFCC coefficients instead of the default 13.", f"SELECT audio.main.mfcc({_TONE_BLOB_SQL}, 20)"),
+        composed.MFCC_TIMBRE_DISTANCE,
     ],
+)
+
+# Composed example (mfcc on both sides of an example_clips self-join, compared
+# with list_distance) carried by the default-arity mfcc overloads.
+_MFCC_DISTANCE_EXAMPLE = FunctionExample(
+    sql=composed.MFCC_TIMBRE_DISTANCE[1], description=composed.MFCC_TIMBRE_DISTANCE[0]
 )
 
 _TAGS_KEY = meta.object_tags(
@@ -805,7 +812,7 @@ class MfccPathFunction(ScalarFunction):
         description = "Mean of each of 13 MFCC coefficients, from a file path"
         categories = ["audio", "spectral"]
         tags = _TAGS_MFCC
-        examples = [_tone_example("mfcc", "13 MFCC means of an inline WAV tone")]
+        examples = [_tone_example("mfcc", "13 MFCC means of an inline WAV tone"), _MFCC_DISTANCE_EXAMPLE]
 
     @classmethod
     def compute(
@@ -852,7 +859,7 @@ class MfccBytesFunction(ScalarFunction):
         description = "Mean of each of 13 MFCC coefficients, from a BLOB of audio bytes"
         categories = ["audio", "spectral"]
         tags = _TAGS_MFCC
-        examples = [_tone_example("mfcc", "13 MFCC means of an inline WAV tone (BLOB)")]
+        examples = [_tone_example("mfcc", "13 MFCC means of an inline WAV tone (BLOB)"), _MFCC_DISTANCE_EXAMPLE]
 
     @classmethod
     def compute(

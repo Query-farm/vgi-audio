@@ -81,8 +81,17 @@ Every function accepts the audio two ways:
 
 ```sql
 -- bytes straight from DuckDB's read_blob:
-SELECT file, audio.duration(content)
+SELECT filename, audio.duration(content)
 FROM read_blob('recordings/*.wav');
+
+-- index a folder: one feature row per file, skipping near-silent recordings
+SELECT filename,
+       audio.duration(content)      AS seconds,
+       audio.tempo(content)         AS bpm,
+       audio.estimated_key(content) AS musical_key
+FROM read_blob('recordings/*.wav')
+WHERE audio.rms_energy(content) > 0.01
+ORDER BY filename;
 ```
 
 Under the hood each feature is registered as **two same-name overloads** — one

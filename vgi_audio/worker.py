@@ -26,7 +26,7 @@ import json
 from vgi import Worker
 from vgi.catalog import Catalog, Schema
 
-from vgi_audio import features
+from vgi_audio import composed, features
 from vgi_audio._example_audio import TONE_WAV_B64
 from vgi_audio.scalars import SCALAR_FUNCTIONS
 from vgi_audio.tables import DISCOVERY_TABLES, TABLE_FUNCTIONS
@@ -71,6 +71,14 @@ _SCHEMA_EXAMPLE_QUERIES = json.dumps(
                 "SELECT name, duration, audio.main.tempo(audio) AS bpm FROM audio.main.example_clips ORDER BY name"
             ),
         },
+        *(
+            {"description": description, "sql": sql}
+            for description, sql in (
+                composed.LOUD_CLIPS_PROFILE,
+                composed.MFCC_TIMBRE_DISTANCE,
+                composed.BEAT_GRID_VS_TEMPO,
+            )
+        ),
     ]
 )
 
@@ -288,6 +296,15 @@ _AGENT_TEST_TASKS_JSON = json.dumps(
             "Using the default settings, does the MFCC feature vector of the built-in example clip named "
             "'click' contain exactly 13 coefficients? Return true or false.",
         ),
+        {
+            # Composed: rank clips by spectral_centroid, then read tempo() of the winner.
+            "name": "brightest-clip-tempo",
+            "prompt": (
+                "Among the catalog's built-in example clips, find the brightest one (highest mean "
+                "spectral centroid). Return one row with two columns: the clip name (VARCHAR) and its "
+                "estimated tempo rounded to the nearest whole BPM as an INTEGER."
+            ),
+        },
         _predicate_task(
             "click-key-minor",
             "Is the estimated musical key of the built-in example clip named 'click' a minor key? "

@@ -41,3 +41,6 @@ tasks:
   - name: click-key-minor
     reference_sql: "SELECT audio.main.estimated_key(audio) LIKE '%minor%' AS answer FROM audio.main.example_clips WHERE name = 'click'"
     ignore_column_names: true
+  - name: brightest-clip-tempo
+    reference_sql: "SELECT name, CAST(round(audio.main.tempo(audio)) AS INTEGER) AS bpm FROM audio.main.example_clips ORDER BY audio.main.spectral_centroid(audio) DESC LIMIT 1"
+    ignore_column_names: true

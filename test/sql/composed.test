@@ -1,0 +1,48 @@
+# name: test/sql/composed.test
+# description: Composed example queries (vgi_audio.composed) combine several worker objects and return the documented rows
+# group: [vgi_audio]
+
+require-env VGI_AUDIO_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION '{VGI_AUDIO_WORKER}');
+
+# ---- beat grid (beats -> window gaps -> median) beside tempo(): both near 120 BPM ----
+# Published SQL from composed.BEAT_GRID_VS_TEMPO, wrapped to assert bands, not exact floats.
+
+query II
+SELECT grid_bpm BETWEEN 110 AND 130, tracker_bpm BETWEEN 100 AND 140 FROM (WITH grid AS (SELECT time - lag(time) OVER (ORDER BY seq) AS gap FROM audio.main.beats(from_base64('ZkxhQwAAACIQABAAAAKoAALrAXcA8AAALuA9uCNM9TPcQHVO83YE6InghAAAKCAAAAByZWZlcmVuY2UgbGliRkxBQyAxLjQuMyAyMDIzMDYyMwAAAAD/+MwIAAa+TgAAAFABQQAA+wz4VAAADrO0FUVVMVT+nmbVhqfRioQKh8i0Gi3RUrQoQS6iRrYQKSMjszgeWPhkqeDB4iMnUhYpZ93snmmNlTMRQAAAAAC4AAEAAABQAWALDMIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////1gggggggggggggggggggggggggggggggggggggggggggggggggggggggggBAB0AAAAYn4OQ6ChAlL0PRUmtapZEiDK3FDLMwSRKXsawu2XlKVcULkLlbk2STf+2xfdcVpVMLQAACcAQABoGwTOYIIIIA/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////w/////////////////////wkov/+MwIAQarTgAAAAAAAAAAAAAAAAAAAAC0FUVVMVT+nmbVhqfRiB/////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////pCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQACAADQAAAAAAAAIg+ADIA0AYIFQ+RaDRboqVoUIJdRI1sIFJGR2ZwPLHwyVPBg8RGTqQsUs+72TzTGypmIoAAAAABcAACAAAAoALAFhmEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQgH//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4f/////////////////////////////////////////+H//////////////////////////////////////////h//////////////////////////////////////////4NL0//h8CAIO3wbGTgAAAAAAAAAAAAAAAAAAAAC0FU1UMXT7HqbShrfRiB//////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+kIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhAAIAANAAAAAAAAAmDoAKgBIAhgRGbGDXW9pJZZwQKMnyZ4KOGwR6JAl4ZH8jghQ+vghpWvnJm1VAg4TC7IwAAAAAC4AAGgAADwAkAWGYQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCEIQhCAf//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4f//////////////////////////////////////+H///////////////////////////////////////h///////////////////////////////////////4LoY='))) SELECT round(60.0 / median(gap), 1) AS grid_bpm, (SELECT round(audio.main.tempo(audio), 1) FROM audio.main.example_clips WHERE name = 'click') AS tracker_bpm FROM grid);
+----
+true	true
+
+# ---- RMS gate keeps only the loud tone; brightness + key computed on the survivor ----
+
+query IIII
+SELECT name, rms > 0.1, centroid_hz BETWEEN 20 AND 200, musical_key IS NOT NULL FROM (SELECT name, round(audio.main.rms_energy(audio), 3) AS rms, round(audio.main.spectral_centroid(audio), 1) AS centroid_hz, audio.main.estimated_key(audio) AS musical_key FROM audio.main.example_clips WHERE audio.main.rms_energy(audio) > 0.1 ORDER BY name);
+----
+tone	true	true	true
+
+# ---- MFCC timbre distance over an example_clips self-join: one pair, positive distance ----
+
+query III
+SELECT clip, other_clip, timbre_distance > 0 FROM (SELECT a.name AS clip, b.name AS other_clip, round(list_distance(audio.main.mfcc(a.audio)[2:], audio.main.mfcc(b.audio)[2:]), 1) AS timbre_distance FROM audio.main.example_clips AS a JOIN audio.main.example_clips AS b ON a.name < b.name ORDER BY timbre_distance, clip, other_clip);
+----
+click	tone	true
+
+# ---- README: read_blob exposes `filename` (not `file`); feature row per file, gated by rms ----
+
+query IIII
+SELECT filename, seconds, bpm > 0, musical_key IS NOT NULL FROM (
+  SELECT filename,
+         audio.duration(content)      AS seconds,
+         audio.tempo(content)         AS bpm,
+         audio.estimated_key(content) AS musical_key
+  FROM read_blob('test/sql/data/*.wav')
+  WHERE audio.rms_energy(content) > 0.01
+) ORDER BY filename;
+----
+test/sql/data/click_120.wav	5.0	true	true
+test/sql/data/tone_440.wav	1.0	true	true

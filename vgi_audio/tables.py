@@ -7,8 +7,12 @@ scalars, the polymorphic audio argument is a ``VARCHAR`` path *or* a ``BLOB`` of
 bytes, exposed as two same-name overloads resolved by argument type:
 
     SELECT * FROM audio.beats('/tmp/click.wav');
-    SELECT * FROM audio.beats(content)      FROM read_blob('*.wav');   -- (via a join)
+    SELECT * FROM audio.beats(from_base64('...'));   -- BLOB literal
     SELECT * FROM audio.audio_info('/tmp/tone.wav');
+
+Arguments must be literals: DuckDB rejects a column (``LATERAL``) or subquery
+argument to a table function, so per-row work over a column of audio uses the
+scalars instead.
 
 Robustness: undecodable / hostile input yields **no rows** (the underlying pure
 logic returns ``None``; the worker never crashes).
@@ -35,7 +39,7 @@ from vgi.table_function import (
 )
 from vgi_rpc.rpc import OutputCollector
 
-from . import features, meta
+from . import composed, features, meta
 from ._example_audio import CLICK_FLAC_B64, TONE_WAV_B64
 from .features import AudioInput
 from .schema_utils import field
@@ -137,8 +141,13 @@ _TAGS_BEATS = meta.object_tags(
             "Beat onset times of an inline 120 BPM click track, in order.",
             f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
         ),
+        composed.BEAT_GRID_VS_TEMPO,
     ],
 )
+
+# Composed example (beats feeding a window + aggregate, beside tempo()) shared by
+# both beats overloads' native example lists.
+_BEAT_GRID_EXAMPLE = FunctionExample(sql=composed.BEAT_GRID_VS_TEMPO[1], description=composed.BEAT_GRID_VS_TEMPO[0])
 
 
 def _emit_beats(audio: AudioInput | None, params: ProcessParams[Any], out: OutputCollector) -> None:
@@ -177,6 +186,7 @@ class BeatsPathFunction(TableFunctionGenerator[_BeatsPathArgs]):
                 sql=f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
                 description="Beat onset times of an inline click track",
             ),
+            _BEAT_GRID_EXAMPLE,
         ]
 
     @classmethod
@@ -209,6 +219,7 @@ class BeatsBytesFunction(TableFunctionGenerator[_BeatsBytesArgs]):
                 sql=f"SELECT seq, time FROM audio.main.beats({_CLICK_BLOB_SQL}) ORDER BY seq",
                 description="Beat onset times from an inline click track (BLOB)",
             ),
+            _BEAT_GRID_EXAMPLE,
         ]
 
     @classmethod
@@ -401,7 +412,7 @@ class _NoArgs:
     """A discovery table function that takes no arguments."""
 
 
-# (name, description, base64 WAV) for each built-in example clip.
+# (name, description, base64 WAV or FLAC file) for each built-in example clip.
 _EXAMPLE_CLIPS: tuple[tuple[str, str, str], ...] = (
     ("tone", "A short 60 Hz mono sine tone (a steady, tonal test signal).", TONE_WAV_B64),
     ("click", "A 120 BPM mono click track (sharp, evenly-spaced onsets).", CLICK_FLAC_B64),
@@ -415,7 +426,12 @@ _CLIPS_SCHEMA = pa.schema(
         field("sample_rate", pa.int32(), "Native sample rate in Hz.", nullable=False),
         field("channels", pa.int32(), "Number of audio channels.", nullable=False),
         field("beat_count", pa.int32(), "Number of beats librosa detects in the clip.", nullable=False),
-        field("audio", pa.binary(), "Raw WAV audio bytes -- pass straight to any feature function.", nullable=False),
+        field(
+            "audio",
+            pa.binary(),
+            "Raw audio file bytes (WAV or FLAC) -- pass straight to any feature function.",
+            nullable=False,
+        ),
     ]
 )
 
@@ -504,7 +520,7 @@ _CLIPS_DOC_MD = (
     "| `sample_rate` | INTEGER | Native sample rate in Hz. |\n"
     "| `channels` | INTEGER | Number of audio channels. |\n"
     "| `beat_count` | INTEGER | Number of beats librosa detects in the clip. |\n"
-    "| `audio` | BLOB | Raw WAV bytes to feed any feature function. |\n\n"
+    "| `audio` | BLOB | Raw audio file bytes (WAV or FLAC) to feed any feature function. |\n\n"
     "Select the `audio` column of a row and pass it straight into a scalar or "
     "table function to try the worker with no file on disk."
 )
@@ -551,7 +567,10 @@ CLIPS_TABLE = Table(
         "sample_rate": "Native sample rate in Hz.",
         "channels": "Number of audio channels (1 = mono).",
         "beat_count": "Number of beats librosa detects in the clip (0 if none).",
-        "audio": "Raw WAV audio bytes -- pass straight to any feature function (e.g. `audio.main.tempo(audio)`).",
+        "audio": (
+            "Raw audio file bytes (WAV or FLAC) -- pass straight to any feature function "
+            "(e.g. `audio.main.tempo(audio)`)."
+        ),
     },
     tags={
         "vgi.title": "Built-in Example Audio Clips",
@@ -575,6 +594,7 @@ CLIPS_TABLE = Table(
                     "description": "Estimate the tempo of the built-in click track by feeding its bytes to tempo().",
                     "sql": ("SELECT audio.main.tempo(audio) AS bpm FROM audio.main.example_clips WHERE name = 'click'"),
                 },
+                {"description": composed.LOUD_CLIPS_PROFILE[0], "sql": composed.LOUD_CLIPS_PROFILE[1]},
             ]
         ),
     },
