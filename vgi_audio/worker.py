@@ -88,13 +88,16 @@ _FUNCTIONS: list[type] = [
 ]
 
 _CATALOG_DESCRIPTION_LLM = (
-    "Extract acoustic and musical features from audio files or raw audio bytes directly in SQL. "
-    "Scalars return per-file metadata (duration, sample_rate, channels) and signal/spectral/rhythmic "
-    "features (tempo in BPM, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
-    "mfcc as `DOUBLE[]`, and a heuristic estimated_key like 'C major'). Table functions return beat onset "
-    "times (beats) and combined metadata (audio_info). Every function accepts either a `VARCHAR` filesystem "
-    "path the worker opens, or a `BLOB` of raw audio bytes. Use it to index, filter, or cluster audio "
-    "collections by their acoustic properties without leaving SQL."
+    "Extract acoustic and musical features from audio files or raw audio bytes directly in SQL, "
+    "computed by librosa (https://librosa.org/) and decoded with libsndfile via soundfile. "
+    "The features fall into families: cheap container metadata, loudness and energy levels, "
+    "spectral-timbre descriptors and compact cepstral feature vectors, rhythm (tempo and beat onsets), "
+    "and a heuristic musical-key estimate. Every function accepts either a `VARCHAR` filesystem path the "
+    "worker opens or a `BLOB` of raw audio bytes; WAV, FLAC and OGG decode natively, compressed formats "
+    "such as MP3 need ffmpeg. Undecodable input yields NULL or no rows rather than an error. Feature "
+    "values are heuristic floats, so compare them against thresholds rather than exact values. A small "
+    "built-in table of example clips carries ready-made audio blobs to experiment with. Use the catalog to "
+    "index, filter, or cluster audio collections by their acoustic properties without leaving SQL."
 )
 
 _CATALOG_DESCRIPTION_MD = (
@@ -126,10 +129,10 @@ _CATALOG_DESCRIPTION_MD = (
 )
 
 _SCHEMA_DESCRIPTION_LLM = (
-    "Audio-feature functions: per-file metadata (duration, sample_rate, channels), signal/spectral/"
-    "rhythmic scalars (tempo, rms_energy, zero_crossing_rate, spectral_centroid, spectral_bandwidth, "
-    "mfcc, estimated_key), and table functions for beat onset times (beats) and combined metadata "
-    "(audio_info). Inputs are a `VARCHAR` path or a `BLOB` of audio bytes."
+    "The audio catalog's librosa-powered feature functions, grouped into container metadata, "
+    "loudness/energy, spectral timbre, rhythm, and tonality categories. Scalars return one value per "
+    "recording; the set-returning functions expand a single literal clip into rows. Inputs are a "
+    "`VARCHAR` path or a `BLOB` of audio bytes, and bad input returns NULL or no rows instead of raising."
 )
 
 _SCHEMA_DESCRIPTION_MD = (
