@@ -1,44 +1,45 @@
-# vgi-audio — dev and test targets.
+# vgi-audio — dev and test targets. `make help` lists them.
 #
-# Usage:
-#   make test       # unit/integration (pytest) + end-to-end SQL (haybarn-unittest)
-#   make test-unit  # pytest only
-#   make test-sql   # DuckDB sqllogictest .test files via haybarn-unittest
-#   make lint       # ruff format check + ruff check + mypy
-#
-# test-sql is self-contained: it points VGI_AUDIO_WORKER at the worker run as
-# a uv stdio subprocess (exactly how DuckDB drives it after ATTACH) and runs the
-# files under test/sql/. haybarn-unittest is a uv tool:
-#   uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'   # ~/.local/bin/haybarn-unittest
-# haybarn 2.0 is required: its community `vgi` extension is the one that speaks the
-# worker's VGI protocol (vgi.v3 / 3.3). --keep-home lets the runner see the
-# extensions installed under the real $HOME (haybarn-unittest 2.0 isolates it).
+# SQL tests (test/sql/*.test) run through the published haybarn-unittest with the
+# signed community `vgi` extension, over each transport (ci/run-integration.sh):
+#   stdio   DuckDB spawns the worker per connection
+#   launch  DuckDB starts the worker once on a unix socket and pools connections
+#   http    the worker serves `--http`, as in Docker deploys
+# One transport only: make test-sql TRANSPORTS=launch
 
-# Worker command DuckDB uses for ATTACH (overridable). Use the project venv's
-# python (the frozen, locked SDK from uv.lock) rather than `uv run <script>`:
-# `uv run` on a PEP-723 script builds a separate, cached environment that can
-# resolve a *different* vgi-python than the one the lockfile pins, so the venv
-# python is the single source of truth for both the E2E and the metadata lint.
-WORKER_STDIO    ?= $(CURDIR)/.venv/bin/python $(CURDIR)/audio_worker.py
+HAYBARN_VERSION  ?= 2.0.0rc11
+TOOLS            := $(CURDIR)/.tools
+HAYBARN_UNITTEST := $(TOOLS)/bin/haybarn-unittest
+WORKER           := $(CURDIR)/.venv/bin/vgi-audio-worker
+TRANSPORTS       ?= stdio launch http
 
-# haybarn-unittest lives in the uv tools bin; keep it on PATH.
-HAYBARN_BIN     ?= $(HOME)/.local/bin
-TEST_DIR         = .
-TEST_PATTERN     = test/sql/*
+.DEFAULT_GOAL := help
+.PHONY: help build tools test test-unit test-sql lint check
 
-.PHONY: test test-unit test-sql lint
+help: ## List the targets
+	@awk 'BEGIN{FS=":.*## "} /^[a-zA-Z_-]+:.*## /{printf "  %-10s %s\n",$$1,$$2}' $(MAKEFILE_LIST)
 
-test: test-unit test-sql
+build: ## Install the worker and dev tools into .venv
+	uv sync --locked --all-extras
 
-test-unit:
+tools: ## Install the pinned SQL test runner into .tools
+	@test -x $(HAYBARN_UNITTEST) || { uv venv -q $(TOOLS) && uv pip install -q -p $(TOOLS) haybarn-unittest==$(HAYBARN_VERSION); }
+
+test-unit: build ## Unit tests (pytest)
 	uv run pytest -q
 
-test-sql:
-	PATH="$(HAYBARN_BIN):$$PATH" \
-		VGI_AUDIO_WORKER="$(WORKER_STDIO)" \
-		haybarn-unittest --keep-home --test-dir "$(TEST_DIR)" "$(TEST_PATTERN)"
+test-sql: build tools ## SQL tests through DuckDB over stdio, launch and http
+	@set -e; for t in $(TRANSPORTS); do \
+	  echo "== test/sql over $$t"; \
+	  WORKER=$(WORKER) HAYBARN_UNITTEST=$(HAYBARN_UNITTEST) TRANSPORT=$$t PYTHON="uv run --no-project python" ci/run-integration.sh; \
+	done
 
-lint:
+test: test-unit test-sql ## Unit + SQL tests
+
+lint: build ## Static checks (mirrors CI's lint job)
 	uv run ruff format --check .
 	uv run ruff check .
-	uv run mypy vgi_audio/
+	uv run mypy vgi_audio/ audio_worker.py
+	uvx pydoclint --config pyproject.toml vgi_audio/ audio_worker.py
+
+check: lint test ## Everything CI runs

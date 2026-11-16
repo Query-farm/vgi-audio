@@ -12,3 +12,4 @@ duckdb_unittest_tempdir/
 # vgi-lint --ai caches (doc-review + agent-simulate verdicts)
 .vgi-review-cache.json
 .vgi-sim-cache.json
+.tools/
