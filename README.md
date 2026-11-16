@@ -18,7 +18,7 @@ times — as plain SQL functions.
 
 ```sql
 INSTALL vgi FROM community; LOAD vgi;
-ATTACH 'audio' (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.4.2 vgi-audio-worker');
+ATTACH 'audio' (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.4.3 vgi-audio-worker');
 
 SELECT audio.duration('/tmp/tone.wav');            -- 2.0   (seconds)
 SELECT audio.sample_rate('/tmp/tone.wav');          -- 22050 (Hz)
@@ -44,7 +44,7 @@ The worker isn't on PyPI; [uv](https://docs.astral.sh/uv/) runs it straight from
 INSTALL vgi FROM community;
 LOAD vgi;
 
-ATTACH 'audio' AS audio (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.4.2 vgi-audio-worker');
+ATTACH 'audio' AS audio (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-audio@v0.4.3 vgi-audio-worker');
 
 -- Length in seconds of an inline WAV tone.
 SELECT audio.main.duration(from_base64('UklGRuwAAABXQVZFZm10IBAAAAABAAEAyAAAAJABAAACABAAZGF0YcgAAAAAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tgAACknb0tvSCkkAAPW2JC0kLfW2AAAKSdvS29IKSQAA9bYkLSQt9bYAAApJ29Lb0gpJAAD1tiQtJC31tg==')) AS seconds;

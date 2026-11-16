@@ -1,6 +1,6 @@
 [project]
 name = "vgi-audio"
-version = "0.4.2"
+version = "0.4.3"
 description = "Extract audio features (duration, tempo, MFCC, key, ...) from audio paths/bytes for DuckDB via VGI"
 readme = "README.md"
 keywords = [
