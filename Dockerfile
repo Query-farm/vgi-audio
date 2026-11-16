@@ -7,7 +7,7 @@
 # soundfile); compressed formats (mp3/m4a) need ffmpeg, which is intentionally not
 # bundled — those decodes return NULL rather than crashing.
 # syntax=docker/dockerfile:1
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 ARG VERSION=0.0.0
 ARG GIT_COMMIT=unknown

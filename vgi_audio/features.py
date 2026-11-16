@@ -252,7 +252,7 @@ def _finite(value: float) -> float | None:
     """Coerce a numpy/py float to a finite Python float, else ``None``."""
     try:
         v = float(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
     if not math.isfinite(v):
         return None
@@ -436,7 +436,7 @@ def mfcc(audio: AudioInput | None, n_mfcc: int = DEFAULT_N_MFCC) -> list[float] 
         return None
     try:
         n = int(n_mfcc)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         n = DEFAULT_N_MFCC
     n = max(1, min(MAX_N_MFCC, n))
     loaded = _load_mono(audio)
