@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
-#     "vgi-python[http]>=0.52.2,<0.53",
+#     "vgi-python[http]>=0.55.1,<0.56",
 #     "librosa>=0.10",
 #     "soundfile>=0.12",
 #     "numpy",
